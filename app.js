@@ -6,7 +6,7 @@ dotenv.config({path: './config.env'})
 require('./db/mongoDb')
 
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: 'https://navkarartistryhub.netlify.app',
     credentials: true
 }));
 
