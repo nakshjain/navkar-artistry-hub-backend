@@ -58,7 +58,8 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 const addProduct=(req, res)=>{
-    const {name, category, imageLink, price, availability, about}=req.body;
+    console.log(req.body)
+    const {name, category, subCategory, imageLink, price, availability, about}=req.body;
     if(!name || !category || !imageLink || !price || !availability){
         console.log('Error')
         console.log(req.body)
@@ -70,7 +71,7 @@ const addProduct=(req, res)=>{
             if(productExist){
                 return res.status(422).json({error :'Product already exists'})
             }
-            const product= new Product({name, category, imageLink, price, availability, about})
+            const product= new Product({name, category, subCategory, imageLink, price, availability, about})
             product.save().then(()=>{
                 res.status(201).json({message: 'Product added successfully'});
             }).catch((err)=>res.status(500).json({error:'Product could not be added'}))
