@@ -19,6 +19,10 @@ app.use(require('./router/auth'));
 app.use(require('./router/user'));
 app.use(require('./router/product'));
 
+app.get('/', (req, res) => {
+    res.send('Welcome to the root endpoint!');
+});
+
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`)
 })
