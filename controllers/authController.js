@@ -50,7 +50,6 @@ const sendOTP=(req,res)=>{
 }
 
 const signUp= async (req, res)=>{
-    console.log(req.body)
     // const {name, email, password}=req.body;
     // if(!name || !email || !password){
     //     return res.status(422).json({error :'PLs fill'})
@@ -58,7 +57,7 @@ const signUp= async (req, res)=>{
 
     const {error}=signUpBodyValidation(req.body);
     if(error){
-        console.log(error)
+        console.error(error)
         return res.status(400).json({error:error});
     }
     const user= await User.findOne({email: req.body.email})
@@ -78,7 +77,7 @@ const login=async (req, res)=> {
     try{
         const {error}=loginBodyValidation(req.body);
         if(error){
-            console.log(error)
+            console.error(error)
             return res.status(400).json({error:error});
         }
         const user= await User.findOne({email: req.body.email})
@@ -105,7 +104,7 @@ const login=async (req, res)=> {
             user: user
         })
     }catch (err){
-        console.log(err);
+        console.error(err);
         res.status(500).json({error:true,message:"Internal Server Error"})
     }
 }

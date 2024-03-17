@@ -4,11 +4,14 @@ const {getAllProducts,
     getProducts,
     getProductById,
     getProductsByCategory,
-    addProduct } = require("../controllers/productController");
+    addProduct, getProductsByPagination
+} = require("../controllers/productController");
 
 router.get('/getAllProducts', getAllProducts)
 
 router.get('/getProducts', getProducts)
+
+router.get('/getProductsByPagination', getProductsByPagination)
 
 router.get('/getProductById/:id', getProductById)
 

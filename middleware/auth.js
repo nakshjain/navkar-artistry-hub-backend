@@ -15,7 +15,7 @@ const auth=async (req,res, next)=>{
         req.user=tokenDetails
         next()
     }catch (err){
-        console.log(err)
+        console.error(err)
         return res
             .status(403)
             .json({error:true, message:"Access Denied: Invalid token"})

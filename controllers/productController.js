@@ -7,7 +7,6 @@ const getAllProducts= async (req, res)=>{
 const getProducts= async (req,res)=>{
     try{
         const {sortingOrder, priceRange, searchText, category, subCategory,availability}=req.query
-        console.log(req.query)
         let query={}
         if(priceRange){
             const [minPrice, maxPrice]=priceRange.split('-')
@@ -41,6 +40,58 @@ const getProducts= async (req,res)=>{
         res.status(500).json({ message: 'Server Error' });
     }
 }
+const getProductsByPagination= async (req,res)=>{
+    try{
+        const {sortingOrder, priceRange, searchText, category, subCategory,availability}=req.query
+        const page=parseInt(req.query.page) || 1
+        const pageSize =parseInt(req.query.pageSize) || 5
+
+        let query={}
+        if(priceRange){
+            const [minPrice, maxPrice]=priceRange.split('-')
+            query.price={$gte: minPrice, $lte:maxPrice}
+        }
+        if(searchText) {
+            query.$or = [
+                { name: { $regex: searchText, $options: 'i' } },
+                { category: { $regex: searchText, $options: 'i' } }
+            ];
+        }
+        if(category) {
+            query.category = category;
+        }
+        if(subCategory){
+            query.subCategory=subCategory
+        }
+        if(availability){
+            query.availability=availability
+        }
+        let productsQuery=Product.find(query)
+        if(sortingOrder){
+            const [sortField, sortOrder] = sortingOrder.split(':');
+            const sortObject = { [sortField]: parseInt(sortOrder) };
+            productsQuery = productsQuery.sort(sortObject);
+        }
+
+        const totalProducts =await Product.countDocuments(query);
+        const totalPages =Math.ceil(totalProducts/pageSize)
+
+        const paginatedProducts= await productsQuery
+            .skip((page-1)*pageSize)
+            .limit(pageSize)
+
+        // const products = await productsQuery;
+        res.status(200).json({
+            totalProducts,
+            totalPages,
+            currentPage: page,
+            products: paginatedProducts
+        });
+    }catch (error){
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
 const getProductById=async (req, res)=>{
     const productId = req.params.id;
     const product= Product.findById(productId)
@@ -58,11 +109,8 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 const addProduct=(req, res)=>{
-    console.log(req.body)
     const {name, category, subCategory, imageLink, price, availability, about}=req.body;
     if(!name || !category || !imageLink || !price || !availability){
-        console.log('Error')
-        console.log(req.body)
         return res.status(422).json({error :'Products details not provided'})
     }
 
@@ -76,12 +124,13 @@ const addProduct=(req, res)=>{
                 res.status(201).json({message: 'Product added successfully'});
             }).catch((err)=>res.status(500).json({error:'Product could not be added'}))
         }).catch(err=>{
-        console.log(err)
+        console.error(err)
     })
 }
 module.exports={
     getAllProducts,
     getProducts,
+    getProductsByPagination,
     getProductsByCategory,
     getProductById,
     addProduct
