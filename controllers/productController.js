@@ -2,7 +2,11 @@ const Product = require("../model/productSchema");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
-    res.send(allProducts);
+    const productsWithoutId = allProducts.map(product => {
+        const { _id, ...productWithoutId } = product.toObject(); // Convert Mongoose document to plain JavaScript object
+        return productWithoutId;
+    });
+    res.send(productsWithoutId);
 }
 const getProducts= async (req,res)=>{
     try{
@@ -80,12 +84,15 @@ const getProductsByPagination= async (req,res)=>{
             .skip((page-1)*pageSize)
             .limit(pageSize)
 
-        // const products = await productsQuery;
+        const paginatedProductsWithoutId = paginatedProducts.map(product => {
+            const { _id, ...productWithoutId } = product.toObject(); // Convert Mongoose document to plain JavaScript object
+            return productWithoutId;
+        });
         res.status(200).json({
             totalProducts,
             totalPages,
             currentPage: page,
-            products: paginatedProducts
+            products: paginatedProductsWithoutId
         });
     }catch (error){
         console.error(error);
@@ -94,11 +101,12 @@ const getProductsByPagination= async (req,res)=>{
 }
 const getProductById=async (req, res)=>{
     const productId = req.params.id;
-    const product= Product.findById(productId)
-        .then(product=>{
-            if(!product){return res.status((404)).end()}
-            return res.status(200).json(product)
-        })
+    const product=await Product.findOne({productId: productId})
+    if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+    }
+    const { _id, ...productWithoutId } = product.toObject()
+    return res.status(200).json(productWithoutId)
 }
 const getProductsByCategory=async (req, res)=>{
     const category = req.params.category;
@@ -109,7 +117,7 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 const addProduct=(req, res)=>{
-    const {name, category, subCategory, imageLink, price, availability, about}=req.body;
+    const {name, category, subCategory, imageLink, price,quantity, availability, about}=req.body;
     if(!name || !category || !imageLink || !price || !availability){
         return res.status(422).json({error :'Products details not provided'})
     }
@@ -119,10 +127,13 @@ const addProduct=(req, res)=>{
             if(productExist){
                 return res.status(422).json({error :'Product already exists'})
             }
-            const product= new Product({name, category, subCategory, imageLink, price, availability, about})
+            const product= new Product({name, category, subCategory, imageLink, price, quantity, availability, about})
             product.save().then(()=>{
                 res.status(201).json({message: 'Product added successfully'});
-            }).catch((err)=>res.status(500).json({error:'Product could not be added'}))
+            }).catch((err)=>{
+                console.log(err)
+                res.status(500).json({error:'Product could not be added'})
+            })
         }).catch(err=>{
         console.error(err)
     })

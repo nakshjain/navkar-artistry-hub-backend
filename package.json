@@ -19,6 +19,7 @@
     "mailgen": "^2.0.28",
     "mongoose": "^8.2.2",
     "nodemailer": "^6.9.12",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "uuid": "^9.0.1"
   }
 }

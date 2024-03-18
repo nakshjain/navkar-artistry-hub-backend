@@ -131,13 +131,12 @@ const login=async (req, res)=> {
             process.env.TOKEN_PRIVATE_KEY,
             {expiresIn:expiry}
         )
-
-        user.password=''
+        const{_id,password,__v,...userWithoutId}=user.toObject()
         res.status(200).json({
             error:false,
             token,
             message:"Logged in successfully",
-            user: user
+            user: userWithoutId
         })
     }catch (err){
         console.error(err);
