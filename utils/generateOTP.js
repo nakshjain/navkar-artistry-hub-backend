@@ -8,7 +8,8 @@ const generateOTP=()=>{
         specialChars:false
     })
 
-    return OTP
+    const validity=new Date(Date.now() + 15 * 60 * 1000)
+    return { OTP, validity };
 }
 
 module.exports=generateOTP

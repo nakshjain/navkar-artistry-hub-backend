@@ -1,22 +1,28 @@
 const bcrypt=require("bcrypt")
 const User=require('../model/userSchema')
+const OTP=require('../model/userOTPSchema')
 const nodemailer=require('nodemailer')
 const Mailgen=require('mailgen')
 const jwt = require("jsonwebtoken");
 const {signUpBodyValidation, loginBodyValidation} = require("../utils/validationSchema");
 const generateOTP = require("../utils/generateOTP");
 
-const sendOTP=(req,res)=>{
+const sendOTP=async (req,res)=>{
     const userEmail=req.body.email
+    const name=req.body.name
+    const user= await User.findOne({email: req.body.email})
+    if(user){
+        return res.status(400).json({error:true,message:"User Already Exists"})
+    }
     let config={
         service:'gmail',
         auth:{
             user:process.env.EMAIL,
             pass:process.env.PASSWORD
-        }
+        },
+        from: '"Navkar Artistry Hub" <' + process.env.EMAIL + '>'
     }
-
-    const OTP=generateOTP()
+    const {OTP: generatedOTP,validity: validity}=generateOTP()
     let transporter = nodemailer.createTransport(config)
     let MailGenerator= new Mailgen({
         theme:"default",
@@ -25,36 +31,56 @@ const sendOTP=(req,res)=>{
             link:"https://navkarartistryhub.com"
         }
     })
-
-    let response={
-        body:{
-            intro:`Your OTP is ${OTP}`
-        },
-        outro:"Looking forward to do more business"
+    let response = {
+        body: {
+            name: name,
+            intro: [`Thank you for registering an account with Navkar Artistry Hub!`,`Your One-Time Password (OTP) for Account Registration: ${generatedOTP}`],
+            instructions: "Please enter this OTP on the registration page to verify your email address and activate your account.",
+            action: {
+                instructions: "If you did not request this OTP or have any questions, please contact our support team immediately.",
+                button: {
+                    text: "Contact Support",
+                    link: "mailto:navkarartistryhub@gmail.com"
+                }
+            },
+            outro: "Looking forward to doing more business."
+        }
     }
 
     let mail=MailGenerator.generate(response)
     let message={
         from: process.env.EMAIL,
         to:userEmail,
-        subject:"Place Order",
+        subject:" Your One-Time Password (OTP) for Account Registration",
         html: mail
     }
+
+    await OTP.deleteOne({email: userEmail})
+    const generatedOTPInt=parseInt(generatedOTP)
+    await new OTP({ email: userEmail, OTP: generatedOTPInt, validity }).save()
     transporter.sendMail(message).then(()=>{
         return res
             .status(201)
-            .json({message:"e-mail sent"})
+            .json({message:"OTP sent"})
     }).catch(error=>{
         return res.status(500).json(error)
     })
 }
+const checkOTPValidity= async (userEmail, otpProvided, res) =>{
+    const otp = await OTP.findOne({ email: userEmail, OTP: otpProvided });
+    if (!otp) {
+        res.status(400).json({error:true,message:"Invalid OTP"});
+        return false
+    }
+    if (otp.validity < Date.now()) {
+        res.status(400).json({error:true,message:"OTP expired"});
+        return false
+    }
+    await OTP.deleteOne({ email: userEmail, OTP: otpProvided })
+    return true;
+}
 
 const signUp= async (req, res)=>{
-    // const {name, email, password}=req.body;
-    // if(!name || !email || !password){
-    //     return res.status(422).json({error :'PLs fill'})
-    // }
-
     const {error}=signUpBodyValidation(req.body);
     if(error){
         console.error(error)
@@ -65,12 +91,16 @@ const signUp= async (req, res)=>{
         return res.status(400).json({error:true,message:"User Already Exists"})
     }
 
-    const salt=await bcrypt.genSalt(Number(process.env.SALT))
-    const hashPassword= await bcrypt.hash(req.body.password, salt)
-
-    await new User({...req.body, password: hashPassword}).save()
-
-    res.status(201).json({error:false, message:"Account created successfully"})
+    const isValid=await checkOTPValidity(req.body.email, req.body.otp, res)
+    if(isValid){
+        const salt=await bcrypt.genSalt(Number(process.env.SALT))
+        const hashPassword= await bcrypt.hash(req.body.password, salt)
+        await new User({...req.body, password: hashPassword}).save()
+        return res.status(201).json({error:false, message:"Account created successfully"})
+    }
+    else{
+        return res
+    }
 }
 
 const login=async (req, res)=> {
