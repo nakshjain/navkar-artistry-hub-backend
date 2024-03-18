@@ -105,6 +105,7 @@ const signUp= async (req, res)=>{
 
 const login=async (req, res)=> {
     try{
+        const {rememberMe}=req.query
         const {error}=loginBodyValidation(req.body);
         if(error){
             console.error(error)
@@ -119,11 +120,16 @@ const login=async (req, res)=> {
         if(!verifiedPassword){
             return res.status(401).json({error:true,message:"Invalid email or password"})
         }
+
+        let expiry="86400"
+        if(rememberMe){
+            expiry="60400"
+        }
         const payload={_id:user._id, roles: user.roles};
         const token=jwt.sign(
             payload,
             process.env.TOKEN_PRIVATE_KEY,
-            {expiresIn:"86400"}
+            {expiresIn:expiry}
         )
 
         user.password=''

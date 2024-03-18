@@ -114,7 +114,7 @@ const addProduct=(req, res)=>{
         return res.status(422).json({error :'Products details not provided'})
     }
 
-    Product.findOne({name:name, category: category})
+    Product.findOne({name:name, category: category, subCategory:subCategory})
         .then((productExist)=>{
             if(productExist){
                 return res.status(422).json({error :'Product already exists'})
