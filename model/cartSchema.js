@@ -1,6 +1,5 @@
 const mongoose=require('mongoose')
 const Product=require('./productSchema')
-const {string} = require("joi");
 
 const Schema=mongoose.Schema
 

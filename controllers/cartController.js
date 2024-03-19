@@ -4,7 +4,6 @@ const Product=require('../model/productSchema')
 
 const getCart=async (req,res)=>{
     try{
-        const _id=req.user
         const user = await User.findById(req.user._id);
         const email = user.toObject().email;
         let userCart=await Cart.findOne({email: email})
@@ -42,7 +41,6 @@ const addToCart=async (req,res)=>{
         const productId= product.productId
         const maxQuantity=product.quantity
 
-        const _id=req.user
         const user = await User.findById(req.user._id);
         const email = user.toObject().email;
         let userCart=await Cart.findOne({email: email})
