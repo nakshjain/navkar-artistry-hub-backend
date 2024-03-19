@@ -18,6 +18,7 @@ const PORT=process.env.PORT;
 app.use(require('./router/auth'));
 app.use(require('./router/user'));
 app.use(require('./router/product'));
+app.use(require('./router/cart'));
 
 app.get('/', (req, res) => {
     res.send('Welcome to the root endpoint!');

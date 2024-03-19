@@ -123,7 +123,7 @@ const login=async (req, res)=> {
 
         let expiry="86400"
         if(rememberMe){
-            expiry="60400"
+            expiry="604000"
         }
         const payload={_id:user._id, roles: user.roles};
         const token=jwt.sign(
