@@ -32,6 +32,44 @@ const getCart=async (req,res)=>{
     }
 }
 
+const mergeCart= async (req,res)=>{
+    try {
+        const logoutCart=req.body.cart
+        const email=req.body.email
+        let userCart=await Cart.findOne({email: email})
+        if(!userCart){
+            userCart=new Cart({
+                email,
+                cart:[]
+            })
+        }
+        if(logoutCart){
+            logoutCart.forEach(
+                (cartItem)=>{
+                    const existingProductIndex = userCart.cart.findIndex(item => item.product.productId===cartItem.product.productId);
+                    if(existingProductIndex !== -1){
+                        const currentQuantity=userCart.cart[existingProductIndex].quantity
+                        if(currentQuantity<cartItem.quantity){
+                            userCart.cart[existingProductIndex].quantity=cartItem.quantity
+                        }
+                    }
+                    else{
+                        userCart.cart.push({
+                            product: cartItem.product,
+                            quantity: cartItem.quantity
+                        });
+                    }
+                }
+            )
+        }
+        await userCart.save();
+        res.status(201).json({ error:false, message: 'Cart Merged Successfully' })
+    } catch (error){
+        console.error(error)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 const addToCart=async (req,res)=>{
     try{
         const {quantityToAdd}=req.query
@@ -80,7 +118,6 @@ const addToCart=async (req,res)=>{
                         userCart.cart[existingProductIndex].quantity-=1;
                         updatedQuantity=userCart.cart[existingProductIndex].quantity
                         if(userCart.cart[existingProductIndex].quantity<=0){
-                            console.log(userCart.cart[existingProductIndex].quantity)
                             userCart.cart.splice(existingProductIndex,1)
                             updatedQuantity=0
                         }
@@ -171,5 +208,6 @@ const removeFromCart=async (req,res)=>{
 module.exports={
     getCart,
     addToCart,
-    removeFromCart
+    removeFromCart,
+    mergeCart
 }
