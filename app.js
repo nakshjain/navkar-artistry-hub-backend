@@ -15,10 +15,14 @@ app.use(bodyParser.json());
 app.use(express.json())
 const PORT=process.env.PORT;
 
-app.use(require('./router/auth'));
-app.use(require('./router/user'));
-app.use(require('./router/product'));
-app.use(require('./router/cart'));
+const authRouter = require('./router/auth');
+app.use('/auth', authRouter);
+const userRouter = require('./router/user');
+app.use('/user', userRouter);
+const productRouter = require('./router/product');
+app.use('/product', productRouter);
+const cartRouter = require('./router/cart');
+app.use('/cart', cartRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the root endpoint!');
