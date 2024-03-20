@@ -36,7 +36,9 @@ const addToCart=async (req,res)=>{
     try{
         const {quantityToAdd}=req.query
         let quantityInt = parseInt(quantityToAdd);
-        const productDoc=new Product(req.body)
+        const existingProduct = await Product.findOne({ productId: req.body.productId });
+        const productData={...existingProduct.toObject(),_id: undefined}
+        const productDoc= new Product(productData)
         const product=productDoc.toObject()
         const productId= product.productId
         const maxQuantity=product.quantity
@@ -46,9 +48,29 @@ const addToCart=async (req,res)=>{
         let userCart=await Cart.findOne({email: email})
         let updatedQuantity=0
 
-        console.log(userCart)
+        if (maxQuantity === 0) {
+            const cartItem = await Cart.findOne({ email: email, 'cart.product.productId': productId });
+
+            if (!cartItem) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'Product out of stock'
+                });
+            }
+
+            await Cart.findOneAndUpdate(
+                { email: email },
+                { $pull: { cart: { 'product.productId': productId } } },
+                { new: true }
+            );
+
+            return res.status(400).json({
+                error: true,
+                message: 'Product out of stock'
+            });
+        }
+
         if(userCart){
-            console.log('Check')
             const existingProductIndex = userCart.cart.findIndex(item => item.product.productId===productId);
 
             if (existingProductIndex !== -1) {
@@ -86,7 +108,6 @@ const addToCart=async (req,res)=>{
                     }
                 }
             } else {
-                console.log('Check')
                 if(!isNaN(quantityInt)){
                     userCart.cart.push({
                         product: product,
@@ -113,7 +134,6 @@ const addToCart=async (req,res)=>{
             })
         }
 
-        console.log(userCart.cart)
         await userCart.save();
         return res.status(201).json({
             error:false,
