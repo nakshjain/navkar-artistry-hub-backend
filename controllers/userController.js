@@ -1,7 +1,4 @@
 const User = require("../model/userSchema");
-const isAuthenticated=(req, res)=>{
-    res.status(200).json({message:'User Authenticated'})
-}
 
 const getUserDetails= async (req, res)=>{
     await User.findById(req.user._id).then((user)=>{
@@ -12,6 +9,5 @@ const getUserDetails= async (req, res)=>{
 }
 
 module.exports={
-    isAuthenticated,
     getUserDetails
 }

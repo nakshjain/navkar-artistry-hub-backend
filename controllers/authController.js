@@ -144,4 +144,8 @@ const login=async (req, res)=> {
     }
 }
 
-module.exports={sendOTP, signUp, login}
+const isAuthenticated=(req, res)=>{
+    res.status(200).json({message:'User Authenticated'})
+}
+
+module.exports={sendOTP, signUp, login, isAuthenticated}
