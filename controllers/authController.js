@@ -121,9 +121,9 @@ const login=async (req, res)=> {
             return res.status(401).json({error:true,message:"Invalid email or password"})
         }
 
-        let expiry="86400"
+        let expiry="1440m"
         if(rememberMe){
-            expiry="604000"
+            expiry="43200m"
         }
         const payload={_id:user._id, roles: user.roles};
         const token=jwt.sign(

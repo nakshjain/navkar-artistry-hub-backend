@@ -23,6 +23,8 @@ const productRouter = require('./router/product');
 app.use('/product', productRouter);
 const cartRouter = require('./router/cart');
 app.use('/cart', cartRouter);
+const wishlistRouter = require('./router/wishlist');
+app.use('/wishlist', wishlistRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the root endpoint!');
