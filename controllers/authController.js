@@ -148,4 +148,20 @@ const isAuthenticated=(req, res)=>{
     res.status(200).json({message:'User Authenticated'})
 }
 
-module.exports={sendOTP, signUp, login, isAuthenticated}
+const isAdmin=async (req, res)=>{
+    try{
+        console.log(req.user)
+        const user=await User.findById(req.user._id)
+        if(user.role.includes('admin')){
+            res.status(200).json({error: false, message:'User is admin'})
+        }
+        else{
+            res.status()
+        }
+    }catch (error){
+        console.error(err);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
+
+module.exports={sendOTP, signUp, login, isAuthenticated, isAdmin}

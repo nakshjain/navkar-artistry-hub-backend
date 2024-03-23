@@ -1,5 +1,4 @@
 const mongoose=require('mongoose')
-const Product=require('./productSchema')
 
 const Schema=mongoose.Schema
 
