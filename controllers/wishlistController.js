@@ -54,7 +54,29 @@ const addToWishlist=async (req,res)=>{
     }
 }
 
+const removeFromWishlist=async (req, res)=>{
+    try{
+        const {productId}=req.body
+        const user=await User.findById(req.user._id)
+        const email=user.toObject().email
+
+        let wishlist=await Wishlist.findOne({email: email})
+        if(wishlist){
+            const existingIndex=wishlist.wishlist.findIndex((id)=> id===productId)
+            if(existingIndex!==-1){
+                wishlist.wishlist.splice(existingIndex,1)
+            }
+        }
+        await wishlist.save()
+        res.status(201).json({error:false, message:'Removed from Wishlist Successfully'})
+    }catch (error){
+        console.error(error)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 module.exports={
     getWishlist,
-    addToWishlist
+    addToWishlist,
+    removeFromWishlist
 }

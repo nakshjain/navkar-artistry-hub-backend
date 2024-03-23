@@ -7,7 +7,6 @@ const getCart=async (req,res)=>{
         const user = await User.findById(req.user._id);
         const email = user.toObject().email;
         let userCart=await Cart.findOne({email: email})
-        console.log(userCart)
         if(userCart){
             const cart=userCart.cart
             const productIds=cart.map(
