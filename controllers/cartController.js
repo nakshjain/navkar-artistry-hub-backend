@@ -7,12 +7,26 @@ const getCart=async (req,res)=>{
         const user = await User.findById(req.user._id);
         const email = user.toObject().email;
         let userCart=await Cart.findOne({email: email})
+        console.log(userCart)
         if(userCart){
             const cart=userCart.cart
-            const cartWithoutId=cart.map((product)=>{
-                const {_id,...productWithoutId}=product.toObject()
-                return productWithoutId
-            })
+            const productIds=cart.map(
+                (cartItem)=>{
+                    const {productId, quantity}=cartItem
+                    return productId
+                }
+            )
+            const products=await Product.find({productId: {$in: productIds}}).select('-_id -__v')
+            const cartWithoutId=cart.map(
+                (cartItem)=>{
+                    const {productId, quantity}=cartItem
+                    const product=products.find((product)=>product.productId===productId)
+                    return {
+                        product: product,
+                        quantity: quantity
+                    }
+                }
+            )
             res.status(200).json({
                 error:false,
                 message:'Cart successfully fetched',
@@ -20,12 +34,17 @@ const getCart=async (req,res)=>{
             })
         }
         else{
-            res.status(400).json({
-                error:true,
-                message:'Empty Cart'
+            userCart= new Cart({
+                email: email,
+                cart: []
+            })
+            await userCart.save()
+            res.status(200).json({
+                error:false,
+                message:'Cart successfully fetched',
+                cart: []
             })
         }
-
     }catch (error){
         console.error(error)
         res.status(500).json({ error: 'Internal Server Error' });
@@ -46,7 +65,7 @@ const mergeCart= async (req,res)=>{
         if(logoutCart){
             logoutCart.forEach(
                 (cartItem)=>{
-                    const existingProductIndex = userCart.cart.findIndex(item => item.product.productId===cartItem.product.productId);
+                    const existingProductIndex = userCart.cart.findIndex(item => item.productId===cartItem.product.productId);
                     if(existingProductIndex !== -1){
                         const currentQuantity=userCart.cart[existingProductIndex].quantity
                         if(currentQuantity<cartItem.quantity){
@@ -55,7 +74,7 @@ const mergeCart= async (req,res)=>{
                     }
                     else{
                         userCart.cart.push({
-                            product: cartItem.product,
+                            productId: cartItem.product.productId,
                             quantity: cartItem.quantity
                         });
                     }
@@ -75,9 +94,7 @@ const addToCart=async (req,res)=>{
         const {quantityToAdd}=req.query
         let quantityInt = parseInt(quantityToAdd);
         const existingProduct = await Product.findOne({ productId: req.body.productId });
-        const productData={...existingProduct.toObject(),_id: undefined}
-        const productDoc= new Product(productData)
-        const product=productDoc.toObject()
+        const product=existingProduct.toObject()
         const productId= product.productId
         const maxQuantity=product.quantity
 
@@ -87,7 +104,7 @@ const addToCart=async (req,res)=>{
         let updatedQuantity=0
 
         if (maxQuantity === 0) {
-            const cartItem = await Cart.findOne({ email: email, 'cart.product.productId': productId });
+            const cartItem = await Cart.findOne({ email: email, 'cart.productId': productId });
 
             if (!cartItem) {
                 return res.status(400).json({
@@ -98,7 +115,7 @@ const addToCart=async (req,res)=>{
 
             await Cart.findOneAndUpdate(
                 { email: email },
-                { $pull: { cart: { 'product.productId': productId } } },
+                { $pull: { cart: { 'productId': productId } } },
                 { new: true }
             );
 
@@ -109,7 +126,7 @@ const addToCart=async (req,res)=>{
         }
 
         if(userCart){
-            const existingProductIndex = userCart.cart.findIndex(item => item.product.productId===productId);
+            const existingProductIndex = userCart.cart.findIndex(item => item.productId===productId);
 
             if (existingProductIndex !== -1) {
                 const existingProductQuantity=userCart.cart[existingProductIndex].quantity
@@ -147,14 +164,14 @@ const addToCart=async (req,res)=>{
             } else {
                 if(!isNaN(quantityInt)){
                     userCart.cart.push({
-                        product: product,
+                        productId: productId,
                         quantity: quantityToAdd
                     });
                     updatedQuantity=quantityToAdd
                 }
                 else{
                     userCart.cart.push({
-                        product: product,
+                        productId: productId,
                         quantity: 1
                     });
                     updatedQuantity=1
@@ -165,7 +182,7 @@ const addToCart=async (req,res)=>{
             userCart= new Cart({
                 email,
                 cart:[{
-                    product: productDoc,
+                    productId: productId,
                     quantity: 1
                 }]
             })
@@ -193,9 +210,9 @@ const removeFromCart=async (req,res)=>{
         const user = await User.findById(req.user._id);
         const email = user.toObject().email;
 
-        const updatedCart = await Cart.findOneAndUpdate(
+        await Cart.findOneAndUpdate(
             { email: email },
-            { $pull: { cart: { 'product.productId': productId } } },
+            { $pull: { cart: { 'productId': productId } } },
             { new: true }
         );
         res.status(201).json({message:'Product removed successfully'})

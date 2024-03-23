@@ -10,8 +10,8 @@ const cartSchema= new Schema({
     },
     cart:[
         {
-            product:{
-                type:Product.schema,
+            productId:{
+                type:String,
                 required:true
             },
             quantity:{
