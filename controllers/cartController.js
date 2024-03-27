@@ -16,20 +16,33 @@ const getCart=async (req,res)=>{
                 }
             )
             const products=await Product.find({productId: {$in: productIds}}).select('-_id -__v')
+            let areSomeOutOfStock=false
             const cartWithoutId=cart.map(
                 (cartItem)=>{
                     const {productId, quantity}=cartItem
                     const product=products.find((product)=>product.productId===productId)
-                    return {
-                        product: product,
-                        quantity: quantity
+                    if(product){
+                        return {
+                            product: product,
+                            quantity: quantity
+                        }
+                    } else {
+                        const index=userCart.cart.findIndex(item=> item.productId===cartItem.productId)
+                        if (index !== -1) {
+                            // userCart.cart.splice(index, 1);
+                            areSomeOutOfStock=true
+                            return null
+                        }
                     }
                 }
-            )
+            ).filter(cartItem => cartItem !== null)
+            await userCart.save()
+            console.log(areSomeOutOfStock)
             res.status(200).json({
                 error:false,
                 message:'Cart successfully fetched',
-                cart: cartWithoutId
+                cart: cartWithoutId,
+                areSomeOutOfStock:areSomeOutOfStock
             })
         }
         else{

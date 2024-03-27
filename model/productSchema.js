@@ -19,9 +19,9 @@ const productSchema= new mongoose.Schema({
         type: String,
         required: true
     },
-    imageLink:{
-        type: String,
-        required: true
+    imageLinks:{
+        type: [String],
+        required: false
     },
     availability:{
         type: Boolean,

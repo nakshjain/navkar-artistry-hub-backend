@@ -117,8 +117,10 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 const addProduct=(req, res)=>{
-    const {name, category, subCategory, imageLink, price,quantity, availability, about}=req.body;
-    if(!name || !category || !imageLink || !price || !availability){
+    console.log(req.body)
+    const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
+    console.log(imageLinks)
+    if(!name || !category || !imageLinks || !price || !availability){
         return res.status(422).json({error :'Products details not provided'})
     }
 
@@ -127,8 +129,9 @@ const addProduct=(req, res)=>{
             if(productExist){
                 return res.status(422).json({error :'Product already exists'})
             }
-            const product= new Product({name, category, subCategory, imageLink, price, quantity, availability, about})
+            const product= new Product({name, category, subCategory, imageLinks, price, quantity, availability, about})
             product.save().then(()=>{
+                console.log(product)
                 res.status(201).json({message: 'Product added successfully'});
             }).catch((err)=>{
                 console.log(err)
