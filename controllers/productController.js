@@ -3,7 +3,7 @@ const Product = require("../model/productSchema");
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
     const productsWithoutId = allProducts.map(product => {
-        const { _id, ...productWithoutId } = product.toObject(); // Convert Mongoose document to plain JavaScript object
+        const { _id, ...productWithoutId } = product.toObject();
         return productWithoutId;
     });
     res.send(productsWithoutId);
@@ -117,9 +117,7 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 const addProduct=(req, res)=>{
-    console.log(req.body)
     const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
-    console.log(imageLinks)
     if(!name || !category || !imageLinks || !price || !availability){
         return res.status(422).json({error :'Products details not provided'})
     }
@@ -131,15 +129,52 @@ const addProduct=(req, res)=>{
             }
             const product= new Product({name, category, subCategory, imageLinks, price, quantity, availability, about})
             product.save().then(()=>{
-                console.log(product)
                 res.status(201).json({message: 'Product added successfully'});
-            }).catch((err)=>{
-                console.log(err)
+            }).catch((error)=>{
+                console.error(error)
                 res.status(500).json({error:'Product could not be added'})
             })
         }).catch(err=>{
         console.error(err)
     })
+}
+const updateProduct= async (req, res)=>{
+    try{
+        const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
+        if(!name || !category || !subCategory || !imageLinks || !price || !quantity || !availability){
+            return res.status(422).json({error :'Products details not provided'})
+        }
+        let product=await Product.findOne({productId: req.body.productId})
+        if(!product){
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        product.name = name;
+        product.category = category;
+        product.subCategory = subCategory;
+        product.imageLinks = imageLinks;
+        product.price = price;
+        product.quantity = quantity;
+        product.availability = availability;
+        product.about = about;
+
+        await product.save()
+        res.status(200).json({ message: 'Product updated successfully', product: product });
+    } catch (error){
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
+
+const deleteProduct= async (req,res)=>{
+    try{
+        const productId=req.params.productId
+        const result=await Product.deleteOne({productId: productId})
+        console.log(result)
+        res.status(200).json({ message: 'Product deleted successfully' });
+    } catch (error){
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
 }
 module.exports={
     getAllProducts,
@@ -147,5 +182,7 @@ module.exports={
     getProductsByPagination,
     getProductsByCategory,
     getProductById,
-    addProduct
+    addProduct,
+    updateProduct,
+    deleteProduct
 }

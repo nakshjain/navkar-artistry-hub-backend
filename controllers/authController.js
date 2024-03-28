@@ -150,7 +150,6 @@ const isAuthenticated=(req, res)=>{
 
 const isAdmin=async (req, res)=>{
     try{
-        console.log(req.user)
         const user=await User.findById(req.user._id)
         if(user.role.includes('admin')){
             res.status(200).json({error: false, message:'User is admin'})
@@ -159,7 +158,7 @@ const isAdmin=async (req, res)=>{
             res.status()
         }
     }catch (error){
-        console.error(err);
+        console.error(error);
         res.status(500).json({error:true,message:"Internal Server Error"})
     }
 }

@@ -37,7 +37,6 @@ const getCart=async (req,res)=>{
                 }
             ).filter(cartItem => cartItem !== null)
             await userCart.save()
-            console.log(areSomeOutOfStock)
             res.status(200).json({
                 error:false,
                 message:'Cart successfully fetched',
@@ -229,7 +228,7 @@ const removeFromCart=async (req,res)=>{
         );
         res.status(201).json({message:'Product removed successfully'})
     } catch (error){
-        console.log(error)
+        console.error(error)
         res.status(500).json({ error: 'Internal Server Error' })
     }
 }
