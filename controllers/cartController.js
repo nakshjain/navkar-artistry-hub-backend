@@ -151,8 +151,14 @@ const addToCart=async (req,res)=>{
                         }
                     }
                     else{
-                        userCart.cart[existingProductIndex].quantity=quantityToAdd
-                        updatedQuantity=userCart.cart[existingProductIndex].quantity
+                        if(quantityToAdd<maxQuantity){
+                            userCart.cart[existingProductIndex].quantity=quantityToAdd
+                            updatedQuantity=userCart.cart[existingProductIndex].quantity
+                        }
+                        else{
+                            userCart.cart[existingProductIndex].quantity=maxQuantity
+                            updatedQuantity=userCart.cart[existingProductIndex].quantity
+                        }
                     }
                 }
                 else{
@@ -161,7 +167,9 @@ const addToCart=async (req,res)=>{
                         updatedQuantity=userCart.cart[existingProductIndex].quantity
                     }
                     else{
+                        console.log(existingProductQuantity)
                         userCart.cart[existingProductIndex].quantity=maxQuantity
+                        await userCart.save()
                         return res.status(201).json({
                             error:false,
                             message:'Maximum items in cart',
@@ -174,11 +182,20 @@ const addToCart=async (req,res)=>{
                 }
             } else {
                 if(!isNaN(quantityInt)){
-                    userCart.cart.push({
-                        productId: productId,
-                        quantity: quantityToAdd
-                    });
-                    updatedQuantity=quantityToAdd
+                    if(quantityToAdd<maxQuantity){
+                        userCart.cart.push({
+                            productId: productId,
+                            quantity: quantityToAdd
+                        });
+                        updatedQuantity=quantityToAdd
+                    }
+                    else{
+                        userCart.cart.push({
+                            productId: productId,
+                            quantity: maxQuantity
+                        });
+                        updatedQuantity=maxQuantity
+                    }
                 }
                 else{
                     userCart.cart.push({
