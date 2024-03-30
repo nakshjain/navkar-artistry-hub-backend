@@ -74,9 +74,37 @@ const removeFromWishlist=async (req, res)=>{
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-
+const mergeWishlist=async (req,res)=>{
+    try{
+        const logoutWishList=req.body.wishlist
+        const email=req.body.email
+        let userWishlist=await Wishlist.findOne({email: email})
+        if(!userWishlist){
+            userWishlist= new Wishlist({
+                email,
+                wishlist:[]
+            })
+        }
+        if(logoutWishList){
+            logoutWishList.forEach(
+                (wishlistItem)=>{
+                    const existingProductIndex=userWishlist.wishlist.findIndex(item=>item===wishlistItem.productId)
+                    if(existingProductIndex === -1){
+                        userWishlist.wishlist.push(wishlistItem.productId)
+                    }
+                }
+            )
+        }
+        await userWishlist.save()
+        res.status(201).json({ error:false, message: 'Wishlist Merged Successfully' })
+    } catch (error){
+        console.error(error)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 module.exports={
     getWishlist,
     addToWishlist,
-    removeFromWishlist
+    removeFromWishlist,
+    mergeWishlist
 }
