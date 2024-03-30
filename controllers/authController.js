@@ -34,8 +34,11 @@ const sendOTP=async (req,res)=>{
     let response = {
         body: {
             name: name,
-            intro: [`Thank you for registering an account with Navkar Artistry Hub!`,`Your One-Time Password (OTP) for Account Registration: ${generatedOTP}`],
-            instructions: "Please enter this OTP on the registration page to verify your email address and activate your account.",
+            intro: [
+                `Thank you for registering an account with Navkar Artistry Hub!`,
+                `Your One-Time Password (OTP) for Account Registration: ${generatedOTP}`,
+                `Please note that this OTP expires in 15 minutes.`
+            ],            instructions: "Please enter this OTP on the registration page to verify your email address and activate your account.",
             action: {
                 instructions: "If you did not request this OTP or have any questions, please contact our support team immediately.",
                 button: {
@@ -61,7 +64,7 @@ const sendOTP=async (req,res)=>{
     transporter.sendMail(message).then(()=>{
         return res
             .status(201)
-            .json({message:"OTP sent"})
+            .json({message:"OTP sent successfully"})
     }).catch(error=>{
         return res.status(500).json(error)
     })
@@ -163,4 +166,99 @@ const isAdmin=async (req, res)=>{
     }
 }
 
-module.exports={sendOTP, signUp, login, isAuthenticated, isAdmin}
+const resetPassword= async (req, res)=>{
+    try {
+        console.log(req.body)
+        const isValid=await checkOTPValidity(req.body.email, req.body.otp, res)
+        if(isValid){
+            let existingUser= await User.findOne({email: req.body.email})
+            const salt=await bcrypt.genSalt(Number(process.env.SALT))
+            const hashPassword= await bcrypt.hash(req.body.password, salt)
+            existingUser.password=hashPassword
+            await existingUser.save()
+            return res.status(201).json({error:false, message:"Password updated successfully"})
+        } else{
+            return res
+        }
+    } catch (error){
+        console.error(error);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
+const resetPasswordSendOtp= async (req, res)=>{
+    try {
+        const {email}=req.body
+        const user= await User.findOne({email: email})
+        if(!user){
+            return res.status(400).json({error:true,message:"User doesn't exists"})
+        }
+        let config={
+            service:'gmail',
+            auth:{
+                user:process.env.EMAIL,
+                pass:process.env.PASSWORD
+            },
+            from: '"Navkar Artistry Hub" <' + process.env.EMAIL + '>'
+        }
+        const {OTP: generatedOTP,validity: validity}=generateOTP()
+        let transporter = nodemailer.createTransport(config)
+        let MailGenerator= new Mailgen({
+            theme:"default",
+            product:{
+                name:"Navkar Artistry Hub",
+                link:"https://navkarartistryhub.com"
+            }
+        })
+        let response = {
+            body: {
+                name: user.name,
+                intro: [
+                    `You've requested to reset your password on Navkar Artistry Hub.`,
+                    `Your One-Time Password (OTP) for Password Reset: ${generatedOTP}`,
+                    `Please note that this OTP expires in 15 minutes.`
+                ],
+                instructions: "Please enter this OTP on the password reset page to verify your identity and set a new password.",
+                action: {
+                    instructions: "If you didn't request this password reset or have any concerns, please contact our support team immediately.",
+                    button: {
+                        text: "Contact Support",
+                        link: "mailto:navkarartistryhub@gmail.com"
+                    }
+                },
+                outro: "Thank you for using our services."
+            }
+        };
+        let mail=MailGenerator.generate(response)
+        let message={
+            from: process.env.EMAIL,
+            to:email,
+            subject:" Your One-Time Password (OTP) for Account Registration",
+            html: mail
+        }
+
+        await OTP.deleteOne({email: email})
+        const generatedOTPInt=parseInt(generatedOTP)
+        const otp = await new OTP({ email: email, OTP: generatedOTPInt, validity })
+        await otp.save()
+        transporter.sendMail(message).then(()=>{
+            return res
+                .status(201)
+                .json({message:"OTP sent successfully"})
+        }).catch(error=>{
+            return res.status(500).json(error)
+        })
+    } catch (error){
+        console.error(error);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
+
+module.exports={
+    sendOTP,
+    signUp,
+    login,
+    isAuthenticated,
+    isAdmin,
+    resetPassword,
+    resetPasswordSendOtp
+}

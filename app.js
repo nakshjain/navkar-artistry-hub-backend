@@ -6,7 +6,7 @@ dotenv.config({path: './config.env'})
 require('./db/mongoDb')
 
 app.use(cors({
-    origin: 'https://navkarartistryhub.com',
+    origin: process.env.ORIGIN_URL,
     credentials: true
 }));
 
