@@ -173,8 +173,7 @@ const resetPassword= async (req, res)=>{
         if(isValid){
             let existingUser= await User.findOne({email: req.body.email})
             const salt=await bcrypt.genSalt(Number(process.env.SALT))
-            const hashPassword= await bcrypt.hash(req.body.password, salt)
-            existingUser.password=hashPassword
+            existingUser.password=await bcrypt.hash(req.body.password, salt)
             await existingUser.save()
             return res.status(201).json({error:false, message:"Password updated successfully"})
         } else{
