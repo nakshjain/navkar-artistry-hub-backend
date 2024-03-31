@@ -1,4 +1,5 @@
 const mongoose=require('mongoose')
+const {v4: uuidv4} = require("uuid");
 
 const Schema= mongoose.Schema
 
@@ -42,6 +43,11 @@ const addressSchema= new Schema({
 })
 
 const userSchema= new Schema({
+    userId: {
+        type: String,
+        default: uuidv4,
+        unique: true
+    },
     name:{
         type: String,
         required: true

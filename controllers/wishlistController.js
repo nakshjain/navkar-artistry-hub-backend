@@ -5,15 +5,15 @@ const Wishlist = require("../model/wishlistSchema");
 const getWishlist=async (req, res)=>{
     try{
         const user=await User.findById(req.user._id)
-        const email=user.toObject().email
-        let wishlist=await Wishlist.findOne({email:email})
+        const userId=user.toObject().userId
+        let wishlist=await Wishlist.findOne({userId:userId})
         let productsInWishlist=[]
         if(wishlist){
             productsInWishlist=await Product.find({productId: {$in: wishlist.wishlist}}).select('-_id -__v')
         } else {
             wishlist=new Wishlist({
-                email: email,
-                wishlist:[productId]
+                userId: userId,
+                wishlist:[]
             })
         }
         await wishlist.save()
@@ -32,9 +32,9 @@ const addToWishlist=async (req,res)=>{
     try{
         const {productId}=req.body
         const user=await User.findById(req.user._id)
-        const email=user.toObject().email
+        const userId=user.toObject().userId
 
-        let wishlist=await Wishlist.findOne({email: email})
+        let wishlist=await Wishlist.findOne({userId: userId})
         if(wishlist){
             const existingIndex=wishlist.wishlist.findIndex((id)=>id===productId)
             if(existingIndex===-1){
@@ -42,7 +42,7 @@ const addToWishlist=async (req,res)=>{
             }
         } else{
             wishlist=new Wishlist({
-                email: email,
+                userId: userId,
                 wishlist:[productId]
             })
         }
@@ -58,9 +58,9 @@ const removeFromWishlist=async (req, res)=>{
     try{
         const {productId}=req.body
         const user=await User.findById(req.user._id)
-        const email=user.toObject().email
+        const userId=user.toObject().userId
 
-        let wishlist=await Wishlist.findOne({email: email})
+        let wishlist=await Wishlist.findOne({userId: userId})
         if(wishlist){
             const existingIndex=wishlist.wishlist.findIndex((id)=> id===productId)
             if(existingIndex!==-1){
@@ -77,11 +77,11 @@ const removeFromWishlist=async (req, res)=>{
 const mergeWishlist=async (req,res)=>{
     try{
         const logoutWishList=req.body.wishlist
-        const email=req.body.email
-        let userWishlist=await Wishlist.findOne({email: email})
+        const userId=req.body.userId
+        let userWishlist=await Wishlist.findOne({userId: userId})
         if(!userWishlist){
             userWishlist= new Wishlist({
-                email,
+                userId,
                 wishlist:[]
             })
         }

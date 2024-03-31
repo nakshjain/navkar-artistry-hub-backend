@@ -5,8 +5,8 @@ const Product=require('../model/productSchema')
 const getCart=async (req,res)=>{
     try{
         const user = await User.findById(req.user._id);
-        const email = user.toObject().email;
-        let userCart=await Cart.findOne({email: email})
+        const userId = user.toObject().userId;
+        let userCart=await Cart.findOne({userId: userId})
         if(userCart){
             const cart=userCart.cart
             const productIds=cart.map(
@@ -46,7 +46,7 @@ const getCart=async (req,res)=>{
         }
         else{
             userCart= new Cart({
-                email: email,
+                userId: userId,
                 cart: []
             })
             await userCart.save()
@@ -65,11 +65,11 @@ const getCart=async (req,res)=>{
 const mergeCart= async (req,res)=>{
     try {
         const logoutCart=req.body.cart
-        const email=req.body.email
-        let userCart=await Cart.findOne({email: email})
+        const userId=req.body.userId
+        let userCart=await Cart.findOne({userId: userId})
         if(!userCart){
             userCart=new Cart({
-                email,
+                userId,
                 cart:[]
             })
         }
@@ -110,12 +110,12 @@ const addToCart=async (req,res)=>{
         const maxQuantity=product.quantity
 
         const user = await User.findById(req.user._id);
-        const email = user.toObject().email;
-        let userCart=await Cart.findOne({email: email})
+        const userId = user.toObject().userId;
+        let userCart=await Cart.findOne({userId: userId})
         let updatedQuantity=0
 
         if (maxQuantity === 0) {
-            const cartItem = await Cart.findOne({ email: email, 'cart.productId': productId });
+            const cartItem = await Cart.findOne({ userId: userId, 'cart.productId': productId });
 
             if (!cartItem) {
                 return res.status(400).json({
@@ -125,7 +125,7 @@ const addToCart=async (req,res)=>{
             }
 
             await Cart.findOneAndUpdate(
-                { email: email },
+                { userId: userId },
                 { $pull: { cart: { 'productId': productId } } },
                 { new: true }
             );
@@ -208,7 +208,7 @@ const addToCart=async (req,res)=>{
         }
         else{
             userCart= new Cart({
-                email,
+                userId: userId,
                 cart:[{
                     productId: productId,
                     quantity: 1
@@ -236,10 +236,10 @@ const removeFromCart=async (req,res)=>{
         const productId=req.body.productId
 
         const user = await User.findById(req.user._id);
-        const email = user.toObject().email;
+        const userId = user.toObject().userId;
 
         await Cart.findOneAndUpdate(
-            { email: email },
+            { userId: userId },
             { $pull: { cart: { 'productId': productId } } },
             { new: true }
         );
