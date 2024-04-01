@@ -21,10 +21,12 @@ const userRouter = require('./router/user');
 app.use('/user', userRouter);
 const productRouter = require('./router/product');
 app.use('/product', productRouter);
-const cartRouter = require('./router/cart');
-app.use('/cart', cartRouter);
 const wishlistRouter = require('./router/wishlist');
 app.use('/wishlist', wishlistRouter);
+const cartRouter = require('./router/cart');
+app.use('/cart', cartRouter);
+const orderRouter = require('./router/order');
+app.use('/order', orderRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the root endpoint!');

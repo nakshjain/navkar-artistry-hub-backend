@@ -8,7 +8,29 @@ const getUserDetails= async (req, res)=>{
         res.status(200).json(userWithoutId)
     })
 }
+ const updateUserDetails= async (req, res)=>{
+    try {
+        const {userDetails}=req.body
+        const name = userDetails.Name;
+        const email = userDetails.Email;
+        const phoneNumber = userDetails['Phone Number'];
+        const dob = userDetails['Date of Birth'];
+        console.log(dob)
 
+        const existingUserDetails= await User.findById(req.user._id)
+        if(existingUserDetails){
+            existingUserDetails.name=name
+            existingUserDetails.email=email
+            existingUserDetails.contactNumber=phoneNumber
+            existingUserDetails.dob=dob
+        }
+        await existingUserDetails.save()
+        res.status(200).json({error: false, message:'User details updated successfully', userDetails: existingUserDetails})
+    } catch (error){
+        console.error(error);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+ }
 const addAddress=async(req,res)=>{
     try{
         const address=req.body.address
@@ -71,6 +93,7 @@ const setDefaultAddress= async (req, res)=>{
 
 module.exports={
     getUserDetails,
+    updateUserDetails,
     addAddress,
     updateAddress,
     removeAddress,

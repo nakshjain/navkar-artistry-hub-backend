@@ -14,9 +14,12 @@ const userOTPSchema= new Schema({
     },
     validity:{
         type: Date,
+        expires: 0,
         required:true
     }
 })
+
+userOTPSchema.index({ validity: 1 }, { expireAfterSeconds: 0 });
 
 const OTP=mongoose.model('OTP',userOTPSchema)
 module.exports=OTP;

@@ -20,6 +20,7 @@
     "mongoose": "^8.2.2",
     "nodemailer": "^6.9.12",
     "otp-generator": "^4.0.1",
+    "razorpay": "^2.9.2",
     "uuid": "^9.0.1"
   }
 }

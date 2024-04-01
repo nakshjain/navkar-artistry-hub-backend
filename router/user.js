@@ -1,9 +1,11 @@
 const express=require('express')
 const auth=require('../middleware/auth')
 const router=express.Router();
-const {getUserDetails, addAddress, updateAddress, removeAddress, setDefaultAddress}=require('../controllers/userController')
+const {getUserDetails, updateUserDetails,  addAddress, updateAddress, removeAddress, setDefaultAddress}=require('../controllers/userController')
 
 router.get('/getUserDetails',auth,getUserDetails)
+
+router.put('/updateUserDetails',auth,updateUserDetails)
 
 router.post('/addAddress',auth,addAddress)
 
