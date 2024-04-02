@@ -1,6 +1,46 @@
 const mongoose = require('mongoose');
+const Schema= mongoose.Schema
 
-const orderSchema = new mongoose.Schema({
+const addressSchema= new Schema({
+    name:{
+        type: String,
+        required: true
+    },
+    contactNumber:{
+        type: Number,
+        required: true
+    },
+    streetAddress:{
+        type: String,
+        required: true
+    },
+    locality:{
+        type: String,
+        required: true
+    },
+    region:{
+        type: String,
+        required: true
+    },
+    state:{
+        type: String,
+        required: true
+    },
+    country:{
+        type: String,
+        required: true
+    },
+    pinCode:{
+        type: Number,
+        required: true
+    },
+    additionInfo:{
+        type: String,
+        required:false
+    }
+})
+
+const orderSchema = new Schema({
     orderId: {
         type: String,
         required: true
@@ -8,6 +48,10 @@ const orderSchema = new mongoose.Schema({
     userId: {
         type: String,
         required: true
+    },
+    deliveryAddress:{
+        type: addressSchema,
+        required: false
     },
     orderDate: {
         type: Date,

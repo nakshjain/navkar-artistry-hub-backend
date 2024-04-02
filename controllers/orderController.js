@@ -43,7 +43,7 @@ const createPaymentOrder=async (req,res)=>{
         })
 
         const options={
-            amount: totalAmount,
+            amount: totalAmount*100,
             currency: "INR",
             receipt: "order_rcptid_11",
             notes:{
@@ -115,7 +115,7 @@ const verifyOrderId=async (req,res)=>{
 
        const orderCreated=await Order.findOne({orderId: orderId})
        if(orderCreated){
-           res.status(200).json({message:'Order Id Verified'})
+           res.status(200).json({message:'Order Id Verified', order: orderCreated})
        }
        else{
            res.status(500).json({message:'Invalid Order Id'})
@@ -126,9 +126,35 @@ const verifyOrderId=async (req,res)=>{
    }
 }
 
+const addAddress=async (req,res)=>{
+    try {
+        const {address, paymentOrderId}=req.body
+        const user=await User.findById(req.user._id)
+        const order=await Order.findOne({userId: user.userId, orderId: paymentOrderId})
+        order.deliveryAddress=address
+        await order.save()
+        res.status(200).json({error: false, message: 'Address added to order successfully'})
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
+const deleteOrder=async (req,res)=>{
+    try {
+        const {orderId}=req.params
+        await Order.deleteOne({orderId: orderId})
+        res.status(200).json({error:false, message: 'Order deleted successfully'})
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
+
 module.exports={
     getAllOrders,
     createPaymentOrder,
     validatePayment,
-    verifyOrderId
+    verifyOrderId,
+    addAddress,
+    deleteOrder
 }

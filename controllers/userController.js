@@ -36,6 +36,9 @@ const addAddress=async(req,res)=>{
         const address=req.body.address
         const user= await User.findById(req.user._id)
         user.addresses.push(address)
+        if(user.addresses.length===1){
+            user.defaultAddress=user.addresses[0]._id
+        }
         await user.save()
         res.status(201).json({error:false, message:"Address added successfully"})
     }catch (error){
