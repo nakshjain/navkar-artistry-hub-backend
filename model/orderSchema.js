@@ -69,9 +69,10 @@ const orderSchema = new Schema({
         required: true
     },
     orderDetails: [{
-        productId: {
-            type: String,
-            required: true
+        product: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'Product'
         },
         quantity: {
             type: Number,

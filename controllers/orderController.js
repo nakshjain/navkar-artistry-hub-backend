@@ -7,8 +7,13 @@ const getAllOrders=async (req,res)=>{
     try{
         const user=await User.findById(req.user._id)
         const userId=user.userId
-
-        const orders=await Order.find({userId: userId, expiryTime: null}).select('-_id -__v -expiryTime')
+        const orders = await Order.find({ userId: userId, expiryTime: null })
+            .select('-_id -__v -expiryTime')
+            .populate({
+                path: 'orderDetails.product',
+                select: 'name imageLinks productId'
+            })
+            .sort({'orderDate':-1})
         res.status(200).json({error: false, orders:orders, message:'Orders fetched successfully'})
     } catch (err){
         console.error(err);
@@ -27,7 +32,7 @@ const createPaymentOrder=async (req,res)=>{
                     const subtotal=pricePerUnit*cartItem.quantity
                     totalAmount+=subtotal
                     orderDetails.push({
-                        productId: cartItem.product.productId,
+                        product: cartItem.product._id,
                         quantity: cartItem.quantity,
                         pricePerUnit: pricePerUnit,
                         subtotal: subtotal

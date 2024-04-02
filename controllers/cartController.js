@@ -15,7 +15,7 @@ const getCart=async (req,res)=>{
                     return productId
                 }
             )
-            const products=await Product.find({productId: {$in: productIds}}).select('-_id -__v')
+            const products=await Product.find({productId: {$in: productIds}}).select('-__v')
             let areSomeOutOfStock=false
             const cartWithoutId=cart.map(
                 (cartItem)=>{
