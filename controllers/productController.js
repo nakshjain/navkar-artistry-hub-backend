@@ -105,8 +105,7 @@ const getProductById=async (req, res)=>{
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
-    const { _id, ...productWithoutId } = product.toObject()
-    return res.status(200).json(productWithoutId)
+    return res.status(200).json(product)
 }
 const getProductsByCategory=async (req, res)=>{
     const category = req.params.category;

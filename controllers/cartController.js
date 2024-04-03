@@ -250,9 +250,22 @@ const removeFromCart=async (req,res)=>{
     }
 }
 
+const clearCart=async (req,res)=>{
+    try{
+        const user = await User.findById(req.user._id);
+        const userId = user.toObject().userId;
+        await Cart.deleteOne({userId: userId})
+        res.status(201).json({message:'Cart cleared successfully'})
+    } catch (error){
+        console.error(error)
+        res.status(500).json({ error: 'Internal Server Error' })
+    }
+}
+
 module.exports={
     getCart,
     addToCart,
     removeFromCart,
+    clearCart,
     mergeCart
 }
