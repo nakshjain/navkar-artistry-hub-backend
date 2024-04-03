@@ -20,6 +20,23 @@ const getAllOrders=async (req,res)=>{
         res.status(500).json({error:true,message:"Internal Server Error"})
     }
 }
+const getOrderDetails=async (req,res)=>{
+    try{
+        const {orderId}=req.params
+        const user=await User.findById(req.user._id)
+        const userId=user.userId
+        const orderDetails= await Order.findOne({orderId: orderId, userId: userId})
+            .select('-_id -__v -expiryTime')
+            .populate({
+                path: 'orderDetails.product',
+                select: 'name imageLinks productId'
+            })
+        res.status(200).json({error: false, order:orderDetails, message:'Order fetched successfully'})
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
 const createPaymentOrder=async (req,res)=>{
     try{
         const {cart, userId}=req.body
@@ -161,5 +178,6 @@ module.exports={
     validatePayment,
     verifyOrderId,
     addAddress,
-    deleteOrder
+    deleteOrder,
+    getOrderDetails
 }

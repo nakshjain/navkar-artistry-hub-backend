@@ -1,9 +1,11 @@
 const express=require('express')
 const router=express.Router()
 const auth=require('../middleware/auth')
-const {getAllOrders, createPaymentOrder, validatePayment, verifyOrderId, addAddress, deleteOrder} = require("../controllers/orderController");
+const {getAllOrders, getOrderDetails, createPaymentOrder, validatePayment, verifyOrderId, addAddress, deleteOrder} = require("../controllers/orderController");
 
 router.get('/getAllOrders', auth, getAllOrders)
+
+router.get('/getOrderDetails/:orderId', auth, getOrderDetails)
 
 router.post('/createPaymentOrder', auth, createPaymentOrder)
 
