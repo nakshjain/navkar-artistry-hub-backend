@@ -167,7 +167,6 @@ const addToCart=async (req,res)=>{
                         updatedQuantity=userCart.cart[existingProductIndex].quantity
                     }
                     else{
-                        console.log(existingProductQuantity)
                         userCart.cart[existingProductIndex].quantity=maxQuantity
                         await userCart.save()
                         return res.status(201).json({

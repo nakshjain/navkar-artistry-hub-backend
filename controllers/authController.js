@@ -168,7 +168,6 @@ const isAdmin=async (req, res)=>{
 
 const resetPassword= async (req, res)=>{
     try {
-        console.log(req.body)
         const isValid=await checkOTPValidity(req.body.email, req.body.otp, res)
         if(isValid){
             let existingUser= await User.findOne({email: req.body.email})
