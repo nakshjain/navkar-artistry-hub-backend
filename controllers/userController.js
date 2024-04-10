@@ -15,7 +15,6 @@ const getUserDetails= async (req, res)=>{
         const email = userDetails.Email;
         const phoneNumber = userDetails['Phone Number'];
         const dob = userDetails['Date of Birth'];
-        console.log(dob)
 
         const existingUserDetails= await User.findById(req.user._id)
         if(existingUserDetails){
