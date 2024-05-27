@@ -7,6 +7,10 @@ const productSchema= new mongoose.Schema({
         default: uuidv4,
         unique: false
     },
+    artistName:{
+        type: String,
+        required: true
+    },
     name:{
         type: String,
         required: true

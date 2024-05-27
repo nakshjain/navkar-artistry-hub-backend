@@ -1,4 +1,5 @@
 const Product = require("../model/productSchema");
+const User = require("../model/userSchema");
 const { Storage } = require("@google-cloud/storage");
 
 const getAllProducts= async (req, res)=>{
@@ -117,18 +118,19 @@ const getProductsByCategory=async (req, res)=>{
         })
 }
 
-const addProduct=(req, res)=>{
+const addProduct= async (req, res)=>{
     const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
     if(!name || !category || !subCategory || !price || !availability || !quantity || !about){
         return res.status(422).json({error :'Products details not provided'})
     }
-
+    const user=await User.findById(req.user._id)
+    const artistName=user.name
     Product.findOne({name:name, category: category, subCategory:subCategory})
         .then((productExist)=>{
             if(productExist){
                 return res.status(422).json({error :'Product already exists'})
             }
-            const product= new Product({name, category, subCategory, imageLinks, price, quantity, availability, about})
+            const product= new Product({artistName, name, category, subCategory, imageLinks, price, quantity, availability, about})
             product.save().then(()=>{
                 res.status(201).json({message: 'Product added successfully'});
             }).catch((error)=>{
@@ -235,8 +237,8 @@ const defaultProductImage= async (req, res)=>{
 
 const updateProduct= async (req, res)=>{
     try{
-        const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
-        if(!name || !category || !subCategory || !imageLinks || !price || !quantity || !availability){
+        const {name, category, subCategory , price,quantity, availability, about}=req.body;
+        if(!name || !category || !subCategory || !price || !quantity || !availability){
             return res.status(422).json({error :'Products details not provided'})
         }
         let product=await Product.findOne({productId: req.body.productId})
@@ -246,7 +248,6 @@ const updateProduct= async (req, res)=>{
         product.name = name;
         product.category = category;
         product.subCategory = subCategory;
-        product.imageLinks = imageLinks;
         product.price = price;
         product.quantity = quantity;
         product.availability = availability;
