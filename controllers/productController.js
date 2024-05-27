@@ -111,7 +111,7 @@ const getProductById=async (req, res)=>{
 }
 const getProductsByCategory=async (req, res)=>{
     const category = req.params.category;
-    const products= Product.find({category:category})
+    Product.find({category:category})
         .then(product=>{
             if(!product){return res.status((404)).end()}
             return res.status(200).json(product)
@@ -151,7 +151,6 @@ const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME); // Get this
 
 const addProductImages = async (req, res) => {
     try {
-        const name = req.body.name;
         const productId = req.body.productId;
 
         let product=await Product.findOne({productId: productId})
