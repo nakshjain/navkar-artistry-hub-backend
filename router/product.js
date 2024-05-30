@@ -4,6 +4,7 @@ const auth=require('../middleware/auth')
 const {getAllProducts,
     getProductById,
     getProductsByCategory,
+    getProductsBySubCategory,
     getProductsByPagination,
     addProduct,
     addProductImages,
@@ -22,6 +23,8 @@ router.get('/getProductsByPagination', getProductsByPagination)
 router.get('/getProductById/:id', getProductById)
 
 router.get('/getProductsByCategory/:category', getProductsByCategory)
+
+router.get('/getProductsBySubCategory/:category/:subCategory', getProductsBySubCategory)
 
 router.post('/addProduct', auth, addProduct)
 

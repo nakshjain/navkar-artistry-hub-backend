@@ -109,9 +109,20 @@ const getProductById=async (req, res)=>{
     }
     return res.status(200).json(product)
 }
+
 const getProductsByCategory=async (req, res)=>{
     const category = req.params.category;
     Product.find({category:category})
+        .then(product=>{
+            if(!product){return res.status((404)).end()}
+            return res.status(200).json(product)
+        })
+}
+
+const getProductsBySubCategory=async (req, res)=>{
+    const category = req.params.category;
+    const subCategory = req.params.subCategory;
+    Product.find({category:category, subCategory:subCategory})
         .then(product=>{
             if(!product){return res.status((404)).end()}
             return res.status(200).json(product)
@@ -276,6 +287,7 @@ module.exports={
     getProducts,
     getProductsByPagination,
     getProductsByCategory,
+    getProductsBySubCategory,
     getProductById,
     addProduct,
     addProductImages,
