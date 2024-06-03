@@ -24,6 +24,7 @@ Navkar Artistry Hub's back-end handles all server-side logic, including API endp
 - Razorpay payment integration
 - Order processing and management
 - Secure API endpoints
+- Images stored in Google Cloud Storage (GCS)
 
 ## Technologies
 - Node.js
@@ -32,6 +33,7 @@ Navkar Artistry Hub's back-end handles all server-side logic, including API endp
 - Mongoose
 - JWT (JSON Web Tokens)
 - Bcrypt (for password hashing)
+- Google Cloud Storage (GCS) for storing images
 
 ## Installation
 To set up the back-end locally, follow these steps:
