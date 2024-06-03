@@ -51,10 +51,17 @@ To set up the back-end locally, follow these steps:
 3. Set up environment variables by creating a `.env` file:
     ```plaintext
     PORT=3000
-    MONGODB_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    RAZORPAY_KEY_ID=your_razorpay_key_id
-    RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+    ORIGIN_URL=your_origin_url
+    DATABASE=your_mongodb_connection_string
+    EMAIL=your_email
+    PASSWORD=your_password
+    SALT=your_salt
+    TOKEN_PRIVATE_KEY=your_token_private_key
+    GOOGLE_CLOUD_BUCKET_NAME=your_google_cloud_bucket_name
+    GOOGLE_CLOUD_KEYFILE_PATH=your_google_cloud_keyfile_path
+    GOOGLE_CLOUD_PROJECT_ID=your_google_cloud_project_id
+    RAZOR_PAY_KEY_ID=your_razorpay_key_id
+    RAZOR_PAY_KEY_SECRET=your_razorpay_key_secret
     ```
 
 4. Start the server:
