@@ -1,4 +1,5 @@
 const Order=require('../model/orderSchema')
+const Product=require('../model/productSchema')
 const User=require('../model/userSchema')
 const Razorpay=require("razorpay")
 const {validatePaymentVerification} = require("razorpay/dist/utils/razorpay-utils");
@@ -119,6 +120,15 @@ const validatePayment=async (req, res)=>{
             order.status='processing'
             order.expiryTime=null
             await order.save()
+            const orderDetails=order.orderDetails
+            for (const item of orderDetails) {
+                let product = await Product.findById(item.product);
+                product.quantity -= item.quantity
+                if(product.quantity===0){
+                    product.availability= false
+                }
+                await product.save()
+            }
             res.status(200).json({data: { isPaymentVerified: isPaymentVerified, paymentId: razorpay_payment_id }})
         }
         else{
