@@ -58,12 +58,6 @@ const orderSchema = new Schema({
         default: Date.now,
         required: true
     },
-    status: {
-        type: String,
-        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
-        default: 'pending',
-        required: true
-    },
     totalAmount: {
         type: Number,
         required: true
@@ -85,7 +79,13 @@ const orderSchema = new Schema({
         subtotal: {
             type: Number,
             required: true
-        }
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+            default: 'pending',
+            required: true
+        },
     }],
     expiryTime: {
         type: Date,

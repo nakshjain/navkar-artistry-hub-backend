@@ -117,7 +117,11 @@ const validatePayment=async (req, res)=>{
         )
         if(isPaymentVerified){
             let order=await Order.findOne({orderId: paymentOrderId})
-            order.status='processing'
+            order.orderDetails.forEach(
+                (orderItem)=>{
+                    orderItem.status='processing'
+                }
+            )
             order.expiryTime=null
             await order.save()
             const orderDetails=order.orderDetails
@@ -182,6 +186,29 @@ const deleteOrder=async (req,res)=>{
     }
 }
 
+const cancelOrder=async (req, res)=>{
+    try {
+        const productId=req.query.productId
+        const quantityOrdered=req.query.quantityOrdered
+        const orderId=req.params.orderId
+        let order= await Order.findOne({orderId: orderId})
+        const index=order.orderDetails.findIndex(item=>String(item.product)===productId)
+        if(index!==-1){
+            order.orderDetails[index].status='cancelled'
+        }
+        await order.save()
+        let product= await Product.findById(productId)
+        if(!product.availability){
+            product.availability=true
+        }
+        product.quantity+=quantityOrdered
+        await product.save()
+        res.status(200).json({error:false, message: 'Order cancelled successfully'})
+    } catch (err){
+        console.error(err);
+        res.status(500).json({error:true,message:"Internal Server Error"})
+    }
+}
 module.exports={
     getAllOrders,
     createPaymentOrder,
@@ -189,5 +216,6 @@ module.exports={
     verifyOrderId,
     addAddress,
     deleteOrder,
-    getOrderDetails
+    getOrderDetails,
+    cancelOrder
 }
