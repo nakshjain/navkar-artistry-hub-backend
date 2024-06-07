@@ -139,7 +139,7 @@ const addProduct= async (req, res)=>{
     Product.findOne({name:name, category: category, subCategory:subCategory})
         .then((productExist)=>{
             if(productExist){
-                return res.status(422).json({error :'Product already exists'})
+                return res.status(409).json({error :'Product already exists'})
             }
             const product= new Product({artistName, name, category, subCategory, imageLinks, price, quantity, availability, about})
             product.save().then(()=>{
@@ -282,6 +282,31 @@ const deleteProduct= async (req,res)=>{
     }
 }
 
+const addReview= async (req,res)=>{
+    try{
+        let {review}=req.body
+        const product= await Product.findOne({productId: req.params.productId})
+
+        review['user']=req.user._id
+        review['verifiedPurchase']=true
+
+        const index=product.reviews.findIndex(review=>review.user.toString()===req.user._id)
+        if(index===-1){
+            res.status(409).json({ message: 'Review Already Exists' });
+        }
+        else {
+            const productRating=product.reviews.length*product.rating
+            product.reviews.push(review)
+            product.rating = (productRating + review.rating) / product.reviews.length
+            await product.save()
+            res.status(201).json({ message: 'Review added successfully' });
+        }
+    } catch (error){
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+}
+
 module.exports={
     getAllProducts,
     getProducts,
@@ -294,5 +319,6 @@ module.exports={
     deleteProductImage,
     defaultProductImage,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    addReview,
 }
