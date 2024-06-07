@@ -289,7 +289,7 @@ const addReview= async (req,res)=>{
             let review={
                 title: req.body.title,
                 writtenReview: req.body.writtenReview,
-                rating: req.body.rating,
+                rating: Number(req.body.rating),
                 user: req.user._id,
                 verifiedPurchase: true,
                 images: []
