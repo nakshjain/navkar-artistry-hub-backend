@@ -39,6 +39,6 @@ router.put('/updateProduct', auth, updateProduct)
 
 router.delete('/deleteProduct/:productId', auth, deleteProduct)
 
-router.post('/addReview/:productId', auth, addReview)
+router.post('/addReview', upload.array("images", 5), auth, addReview)
 
 module.exports=router

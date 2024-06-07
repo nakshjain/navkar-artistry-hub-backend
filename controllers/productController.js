@@ -274,7 +274,7 @@ const updateProduct= async (req, res)=>{
 const deleteProduct= async (req,res)=>{
     try{
         const productId=req.params.productId
-        const result=await Product.deleteOne({productId: productId})
+        await Product.deleteOne({productId: productId})
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error){
         console.error(error);
@@ -284,22 +284,53 @@ const deleteProduct= async (req,res)=>{
 
 const addReview= async (req,res)=>{
     try{
-        let {review}=req.body
-        const product= await Product.findOne({productId: req.params.productId})
+        let product= await Product.findOne({productId: req.body.productId})
+        if(product){
+            let review={
+                title: req.body.title,
+                writtenReview: req.body.writtenReview,
+                rating: req.body.rating,
+                user: req.user._id,
+                verifiedPurchase: true,
+                images: []
+            }
 
-        review['user']=req.user._id
-        review['verifiedPurchase']=true
-
-        const index=product.reviews.findIndex(review=>review.user.toString()===req.user._id)
-        if(index===-1){
-            res.status(409).json({ message: 'Review Already Exists' });
-        }
-        else {
+            const name = product.name.toLowerCase().replace(/\s+/g, '-');
+            const category = product.category.toLowerCase().replace(/\s+/g, '-');
+            const subCategory = product.subCategory.toLowerCase().replace(/\s+/g, '-');
+            const link=`https://assets.navkarartistryhub.com/`
+            if (req.files.length!==0) {
+                let uploadFailed = false;
+                for (const file of req.files) {
+                    const filePath = `reviews/${category}/${subCategory}/${name}/${file.originalname}`;
+                    const blob = bucket.file(filePath);
+                    const blobStream = blob.createWriteStream();
+                    await new Promise((resolve, reject) => {
+                        blobStream.on("error", (err) => {
+                            uploadFailed = true;
+                            reject(err);
+                        });
+                        blobStream.on("finish", () => {
+                            const imageLink = link + filePath;
+                            review.images.push(imageLink);
+                            resolve();
+                        });
+                        blobStream.end(file.buffer);
+                    });
+                }
+                if (uploadFailed) {
+                    res.status(500).json({ message: 'Some files failed to upload' });
+                }
+            }
             const productRating=product.reviews.length*product.rating
             product.reviews.push(review)
             product.rating = (productRating + review.rating) / product.reviews.length
+
             await product.save()
             res.status(201).json({ message: 'Review added successfully' });
+        }
+        else{
+            res.status(400).json({ message: 'Product not found'})
         }
     } catch (error){
         console.error(error);
