@@ -1,5 +1,6 @@
 const Product = require("../model/productSchema");
 const User = require("../model/userSchema");
+const Order = require('../model/orderSchema')
 const { Storage } = require("@google-cloud/storage");
 
 const getAllProducts= async (req, res)=>{
@@ -104,6 +105,23 @@ const getProductsByPagination= async (req,res)=>{
 const getProductById=async (req, res)=>{
     const productId = req.params.id;
     const product=await Product.findOne({productId: productId})
+        .populate({
+            path:'reviews.user',
+            select:'name'
+        })
+    if(product && product.reviews){
+        product.reviews.sort((a,b)=>{
+            const aHasImages = a.images && a.images.length > 0;
+            const bHasImages = b.images && b.images.length > 0;
+
+            if (aHasImages && !bHasImages) {
+                return -1;
+            } else if (!aHasImages && bHasImages) {
+                return 1;
+            }
+            return b.rating-a.rating
+        })
+    }
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
@@ -286,12 +304,18 @@ const addReview= async (req,res)=>{
     try{
         let product= await Product.findOne({productId: req.body.productId})
         if(product){
+            const user= await User.findById(req.user._id)
+            const orderDetails=await Order.exists({userId: user.userId, 'orderDetails.product': product._id})
+            let verifiedPurchase=false
+            if(orderDetails){
+                verifiedPurchase=true
+            }
             let review={
                 title: req.body.title,
                 writtenReview: req.body.writtenReview,
                 rating: Number(req.body.rating),
                 user: req.user._id,
-                verifiedPurchase: true,
+                verifiedPurchase: verifiedPurchase,
                 images: []
             }
 
