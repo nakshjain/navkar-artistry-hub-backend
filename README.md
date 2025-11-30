@@ -52,6 +52,7 @@ To set up the back-end locally, follow these steps:
     ```plaintext
     PORT=3000
     ORIGIN_URL=your_origin_url
+    ASSETS_URL=your_assets_url
     DATABASE=your_mongodb_connection_string
     EMAIL=your_email
     PASSWORD=your_password
