@@ -17,6 +17,8 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(express.json())
 
+const assetDecorator = require("./middleware/assetDecorator");
+app.use(assetDecorator);
 const authRouter = require('./router/auth');
 app.use('/auth', authRouter);
 const userRouter = require('./router/user');

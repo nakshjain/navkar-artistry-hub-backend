@@ -9,7 +9,7 @@ const getAllProducts= async (req, res)=>{
         const { _id, ...productWithoutId } = product.toObject();
         return productWithoutId;
     });
-    res.send(productsWithoutId);
+    res.send(res.addAssetUrl(productsWithoutId));
 }
 const getProducts= async (req,res)=>{
     try{
@@ -41,7 +41,7 @@ const getProducts= async (req,res)=>{
             productsQuery = productsQuery.sort(sortObject);
         }
         const products = await productsQuery;
-        res.status(200).json(products);
+        res.status(200).json(res.addAssetUrl(products));
     }catch (error){
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -95,7 +95,7 @@ const getProductsByPagination= async (req,res)=>{
             totalProducts,
             totalPages,
             currentPage: page,
-            products: paginatedProductsWithoutId
+            products: res.addAssetUrl(paginatedProductsWithoutId)
         });
     }catch (error){
         console.error(error);
@@ -125,7 +125,7 @@ const getProductById=async (req, res)=>{
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
-    return res.status(200).json(product)
+    return res.status(200).json(res.addAssetUrl(product))
 }
 
 const getProductsByCategory=async (req, res)=>{
@@ -133,7 +133,7 @@ const getProductsByCategory=async (req, res)=>{
     Product.find({category:category})
         .then(product=>{
             if(!product){return res.status((404)).end()}
-            return res.status(200).json(product)
+            return res.status(200).json(res.addAssetUrl(product))
         })
 }
 
@@ -143,7 +143,7 @@ const getProductsBySubCategory=async (req, res)=>{
     Product.find({category:category, subCategory:subCategory})
         .then(product=>{
             if(!product){return res.status((404)).end()}
-            return res.status(200).json(product)
+            return res.status(200).json(res.addAssetUrl(product))
         })
 }
 
@@ -186,11 +186,10 @@ const addProductImages = async (req, res) => {
         if(product){
             const category = product.category.toLowerCase().replace(/\s+/g, '-');
             const subCategory = product.subCategory.toLowerCase().replace(/\s+/g, '-');
-            const link=`https://assets.navkarartistryhub.com/`
             if (req.files.length!==0) {
                 let uploadFailed = false;
                 for (const file of req.files) {
-                    const filePath = `${category}/${subCategory}/${file.originalname}`;
+                    const filePath = `/${category}/${subCategory}/${file.originalname}`;
                     const blob = bucket.file(filePath);
                     const blobStream = blob.createWriteStream();
                     await new Promise((resolve, reject) => {
@@ -322,11 +321,10 @@ const addReview= async (req,res)=>{
             const name = product.name.toLowerCase().replace(/\s+/g, '-');
             const category = product.category.toLowerCase().replace(/\s+/g, '-');
             const subCategory = product.subCategory.toLowerCase().replace(/\s+/g, '-');
-            const link=`https://assets.navkarartistryhub.com/`
             if (req.files.length!==0) {
                 let uploadFailed = false;
                 for (const file of req.files) {
-                    const filePath = `reviews/${category}/${subCategory}/${name}/${file.originalname}`;
+                    const filePath = `/reviews/${category}/${subCategory}/${name}/${file.originalname}`;
                     const blob = bucket.file(filePath);
                     const blobStream = blob.createWriteStream();
                     await new Promise((resolve, reject) => {
