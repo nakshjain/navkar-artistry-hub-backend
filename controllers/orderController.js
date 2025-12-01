@@ -15,7 +15,7 @@ const getAllOrders=async (req,res)=>{
                 select: 'name imageLinks productId'
             })
             .sort({'orderDate':-1})
-        res.status(200).json({error: false, orders:orders, message:'Orders fetched successfully'})
+        res.status(200).json({error: false, orders:res.addAssetUrl(orders), message:'Orders fetched successfully'})
     } catch (err){
         console.error(err);
         res.status(500).json({error:true,message:"Internal Server Error"})
@@ -32,7 +32,7 @@ const getOrderDetails=async (req,res)=>{
                 path: 'orderDetails.product',
                 select: 'name imageLinks productId'
             })
-        res.status(200).json({error: false, order:orderDetails, message:'Order fetched successfully'})
+        res.status(200).json({error: false, order:res.addAssetUrl(orderDetails), message:'Order fetched successfully'})
     } catch (err){
         console.error(err);
         res.status(500).json({error:true,message:"Internal Server Error"})
