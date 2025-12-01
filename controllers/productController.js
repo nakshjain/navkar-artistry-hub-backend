@@ -2,6 +2,8 @@ const Product = require("../model/productSchema");
 const User = require("../model/userSchema");
 const Order = require('../model/orderSchema')
 const { Storage } = require("@google-cloud/storage");
+const R2 = require("../config/r2");
+const {PutObjectCommand} = require("@aws-sdk/client-s3");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
@@ -181,45 +183,46 @@ const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME); // Get this
 const addProductImages = async (req, res) => {
     try {
         const productId = req.body.productId;
+        const product = await Product.findOne({ productId });
 
-        let product=await Product.findOne({productId: productId})
-        if(product){
-            const category = product.category.toLowerCase().replace(/\s+/g, '-');
-            const subCategory = product.subCategory.toLowerCase().replace(/\s+/g, '-');
-            if (req.files.length!==0) {
-                let uploadFailed = false;
-                for (const file of req.files) {
-                    const filePath = `/${category}/${subCategory}/${file.originalname}`;
-                    const blob = bucket.file(filePath);
-                    const blobStream = blob.createWriteStream();
-                    await new Promise((resolve, reject) => {
-                        blobStream.on("error", (err) => {
-                            uploadFailed = true;
-                            reject(err);
-                        });
-                        blobStream.on("finish", () => {
-                            const imageLink = link + filePath;
-                            product.imageLinks.push(imageLink);
-                            resolve();
-                        });
-                        blobStream.end(file.buffer);
-                    });
-                }
-                if (uploadFailed) {
-                    res.status(500).json({ message: 'Some files failed to upload' });
-                } else {
-                    await product.save()
-                    res.status(201).json({ message: 'Images added successfully' });
-                }
-            } else {
-                res.status(400).json({ message: 'No files found in the request' });
-            }
+        if (!product) {
+            return res.status(400).json({ message: 'Product not found' });
         }
-        else{
-            res.status(400).json({ message: 'Product not found'})
+
+        const category = product.category.toLowerCase().replaceAll(/\s+/g, '-');
+        const subCategory = product.subCategory.toLowerCase().replaceAll(/\s+/g, '-');
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files found' });
         }
+
+        let uploadFailed = false;
+
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const ext = file.originalname.split('.').pop().toLowerCase();
+
+            const filename = `${i}.${ext}`;
+
+            const filePath = `navkarArtistryHub/products/${category}/${subCategory}/${productId}/${filename}`;
+
+            await R2.client.send(new PutObjectCommand({
+                Bucket: R2.BUCKET,
+                Key: filePath,
+                Body: file.buffer,
+                ContentType: file.mimetype,
+            }));
+
+            const imageLink = `${R2.PUBLIC_URL}/${filePath}`;
+            product.imageLinks.push(imageLink);
+        }
+
+        await product.save();
+
+        res.status(201).json({ message: 'Images added successfully' });
+
     } catch (error) {
-        console.error("Error:", error);
+        console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
