@@ -2,7 +2,7 @@ const Product = require("../model/productSchema");
 const User = require("../model/userSchema");
 const Order = require('../model/orderSchema')
 const R2 = require("../config/r2");
-const {PutObjectCommand} = require("@aws-sdk/client-s3");
+const {PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
@@ -221,15 +221,19 @@ const addProductImages = async (req, res) => {
 const deleteProductImage= async (req,res)=>{
     try{
         const {imageUrl, productId}=req.body
-        const parts=imageUrl.split('/')
-        parts.splice(0,3)
-        const filePathName=parts.join('/')
-        await bucket.file(filePathName).delete()
-        let product= await Product.findOne({productId: productId})
-        let i =product.imageLinks.indexOf(imageUrl)
-        product.imageLinks.splice(i, 1)
+        const key=imageUrl.replace(R2.PUBLIC_URL, "");
+
+        await R2.client.send(
+            new DeleteObjectCommand({
+                Bucket: R2.BUCKET,
+                Key: key,
+            })
+        )
+
+        const product= await Product.findOne({productId: productId})
+        product.imageLinks = product.imageLinks.filter((img) => img !== imageUrl)
         await product.save()
-        res.status(201).json({message: 'Product Image Removed Successfully'})
+        res.status(200).json({message: 'Product Image Removed Successfully'})
     } catch (error){
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
