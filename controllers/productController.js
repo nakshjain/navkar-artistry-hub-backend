@@ -38,7 +38,7 @@ const getProducts= async (req,res)=>{
         let productsQuery=Product.find(query)
         if(sortingOrder){
             const [sortField, sortOrder] = sortingOrder.split(':');
-            const sortObject = { [sortField]: parseInt(sortOrder) };
+            const sortObject = { [sortField]: Number.parseInt(sortOrder) };
             productsQuery = productsQuery.sort(sortObject);
         }
         const products = await productsQuery;
@@ -51,8 +51,8 @@ const getProducts= async (req,res)=>{
 const getProductsByPagination= async (req,res)=>{
     try{
         const {sortingOrder, priceRange, searchText, category, subCategory,availability}=req.query
-        const page=parseInt(req.query.page) || 1
-        const pageSize =parseInt(req.query.pageSize) || 5
+        const page=Number.parseInt(req.query.page) || 1
+        const pageSize =Number.parseInt(req.query.pageSize) || 5
 
         let query={}
         if(priceRange){
@@ -77,7 +77,7 @@ const getProductsByPagination= async (req,res)=>{
         let productsQuery=Product.find(query)
         if(sortingOrder){
             const [sortField, sortOrder] = sortingOrder.split(':');
-            const sortObject = { [sortField]: parseInt(sortOrder) };
+            const sortObject = { [sortField]: Number.parseInt(sortOrder) };
             productsQuery = productsQuery.sort(sortObject);
         }
 
@@ -186,8 +186,6 @@ const addProductImages = async (req, res) => {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'No files found' });
         }
-
-        let uploadFailed = false;
 
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
@@ -316,9 +314,9 @@ const addReview= async (req,res)=>{
                 images: []
             }
 
-            const name = product.name.toLowerCase().replace(/\s+/g, '-');
-            const category = product.category.toLowerCase().replace(/\s+/g, '-');
-            const subCategory = product.subCategory.toLowerCase().replace(/\s+/g, '-');
+            const name = product.name.toLowerCase().replaceAll(/\s+/g, '-');
+            const category = product.category.toLowerCase().replaceAll(/\s+/g, '-');
+            const subCategory = product.subCategory.toLowerCase().replaceAll(/\s+/g, '-');
             if (req.files.length!==0) {
                 let uploadFailed = false;
                 for (const file of req.files) {
