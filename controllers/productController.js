@@ -1,7 +1,6 @@
 const Product = require("../model/productSchema");
 const User = require("../model/userSchema");
 const Order = require('../model/orderSchema')
-const { Storage } = require("@google-cloud/storage");
 const R2 = require("../config/r2");
 const {PutObjectCommand} = require("@aws-sdk/client-s3");
 
@@ -171,14 +170,6 @@ const addProduct= async (req, res)=>{
         console.error(err)
     })
 }
-
-let projectId = process.env.GOOGLE_CLOUD_PROJECT_ID; // Get this from Google Cloud
-let keyFilename = process.env.GOOGLE_CLOUD_KEYFILE_PATH; // Get this from Google Cloud -> Credentials -> Service Accounts
-const storage = new Storage({
-    projectId,
-    keyFilename,
-});
-const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME); // Get this from Google Cloud -> Storage
 
 const addProductImages = async (req, res) => {
     try {
