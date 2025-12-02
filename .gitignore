@@ -1,5 +1,5 @@
 node_modules
 
-config.env
+.env
 
 GOOGLE_CLOUD_KEYFILE.json
