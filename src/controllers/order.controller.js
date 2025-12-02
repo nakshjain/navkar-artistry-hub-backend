@@ -1,6 +1,6 @@
-const Order=require('../model/orderSchema')
-const Product=require('../model/productSchema')
-const User=require('../model/userSchema')
+const Order=require('../model/Order')
+const Product=require('../model/Product')
+const User=require('../model/User')
 const Razorpay=require("razorpay")
 const {validatePaymentVerification} = require("razorpay/dist/utils/razorpay-utils");
 

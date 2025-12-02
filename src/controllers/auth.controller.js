@@ -1,6 +1,6 @@
 const bcrypt=require("bcrypt")
-const User=require('../model/userSchema')
-const OTP=require('../model/userOTPSchema')
+const User=require('../model/User')
+const OTP=require('../model/UserOTP')
 const nodemailer=require('nodemailer')
 const Mailgen=require('mailgen')
 const jwt = require("jsonwebtoken");

@@ -1,7 +1,7 @@
-const Product = require("../model/productSchema");
-const User = require("../model/userSchema");
-const Order = require('../model/orderSchema')
-const R2 = require("../config/r2");
+const Product = require("../model/Product");
+const User = require("../model/User");
+const Order = require('../model/Order')
+const R2 = require("../config/storage");
 const {PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
 
 const getAllProducts= async (req, res)=>{

@@ -6,7 +6,7 @@ const cors = require('cors');
 const PORT=process.env.PORT;
 
 dotenv.config({path: './config.env'})
-require('./db/mongoDb')
+require('./config/db')
 
 app.use(cors({
     origin: process.env.ORIGIN_URL,
@@ -19,19 +19,19 @@ app.use(express.json())
 
 const assetDecorator = require("./middleware/assetDecorator");
 app.use(assetDecorator);
-const authRouter = require('./router/auth');
+const authRouter = require('./routes/auth.routes');
 app.use('/auth', authRouter);
-const homeRouter = require('./router/home');
+const homeRouter = require('./routes/home.routes');
 app.use('/home', homeRouter);
-const userRouter = require('./router/user');
+const userRouter = require('./routes/user.routes');
 app.use('/user', userRouter);
-const productRouter = require('./router/product');
+const productRouter = require('./routes/product.routes');
 app.use('/product', productRouter);
-const wishlistRouter = require('./router/wishlist');
+const wishlistRouter = require('./routes/wishlist.routes');
 app.use('/wishlist', wishlistRouter);
-const cartRouter = require('./router/cart');
+const cartRouter = require('./routes/cart.routes');
 app.use('/cart', cartRouter);
-const orderRouter = require('./router/order');
+const orderRouter = require('./routes/order.routes');
 app.use('/order', orderRouter);
 
 app.get('/', (req, res) => {

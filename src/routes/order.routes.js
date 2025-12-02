@@ -1,7 +1,7 @@
 const express=require('express')
 const router=express.Router()
 const auth=require('../middleware/auth')
-const {getAllOrders, getOrderDetails, createPaymentOrder, validatePayment, verifyOrderId, addAddress, deleteOrder, cancelOrder} = require("../controllers/orderController");
+const {getAllOrders, getOrderDetails, createPaymentOrder, validatePayment, verifyOrderId, addAddress, deleteOrder, cancelOrder} = require("../controllers/order.controller");
 
 router.get('/getAllOrders', auth, getAllOrders)
 

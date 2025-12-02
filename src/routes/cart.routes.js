@@ -1,7 +1,7 @@
 const express=require('express')
 const router=express.Router()
 const auth=require('../middleware/auth')
-const {getCart, addToCart, removeFromCart, clearCart, mergeCart}=require('../controllers/cartController')
+const {getCart, addToCart, removeFromCart, clearCart, mergeCart}=require('../controllers/cart.controller')
 
 router.get('/getCart', auth, getCart)
 

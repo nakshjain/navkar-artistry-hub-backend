@@ -12,7 +12,7 @@ const {getAllProducts,
     defaultProductImage,
     updateProduct,
     deleteProduct,
-    addReview} = require("../controllers/productController");
+    addReview} = require("../controllers/product.controller");
 
 const multer = require('multer');
 const upload = multer();

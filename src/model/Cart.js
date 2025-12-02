@@ -2,7 +2,7 @@ const mongoose=require('mongoose')
 
 const Schema=mongoose.Schema
 
-const cartSchema= new Schema({
+const CartSchema= new Schema({
     userId: {
         type: String,
         unique: true,
@@ -22,6 +22,6 @@ const cartSchema= new Schema({
     ]
 })
 
-const Cart= mongoose.model('Cart', cartSchema)
+const Cart= mongoose.model('Cart', CartSchema)
 
 module.exports=Cart
