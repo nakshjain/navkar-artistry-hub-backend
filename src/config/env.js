@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-module.exports = {
+const config = {
     NODE_ENV: process.env.NODE_ENV || "development",
 
     PORT: process.env.PORT || 3000,
@@ -32,3 +32,7 @@ module.exports = {
     CLOUD_PROJECT_ID: process.env.CLOUD_PROJECT_ID,
     CLOUD_ENDPOINT: process.env.CLOUD_ENDPOINT,
 };
+
+global.env = config
+
+module.exports = config

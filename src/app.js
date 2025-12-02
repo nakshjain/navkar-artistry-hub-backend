@@ -1,9 +1,10 @@
+require("./config/env");
 const express =require('express');
 const dotenv=require("dotenv")
 const app=express();
 const cors = require('cors');
 
-const PORT=process.env.PORT;
+const PORT=env.PORT;
 
 dotenv.config({path: './config.env'})
 require('./config/db')
