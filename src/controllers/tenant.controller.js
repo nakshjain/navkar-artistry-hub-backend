@@ -1,3 +1,3 @@
-const TenantSchema = require("../model/Tenant");
+const TenantSchema = require("../models/Tenant");
 
 module.exports={}

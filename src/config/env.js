@@ -33,6 +33,6 @@ const config = {
     CLOUD_ENDPOINT: process.env.CLOUD_ENDPOINT,
 };
 
-global.env = config
+globalThis.env = config
 
 module.exports = config

@@ -1,4 +1,4 @@
-const Tenant = require("../model/Tenant");
+const Tenant = require("../models/Tenant");
 
 const tenantResolver = async (req, res, next) => {
     try {

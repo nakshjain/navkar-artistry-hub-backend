@@ -1,6 +1,6 @@
-const Product = require("../model/Product");
-const User = require("../model/User");
-const Order = require('../model/Order')
+const Product = require("../models/Product");
+const User = require("../models/User");
+const Order = require('../models/Order')
 const R2 = require("../config/storage");
 const {PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
 

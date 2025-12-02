@@ -1,6 +1,6 @@
-const User=require('../model/User')
-const Cart=require('../model/Cart')
-const Product=require('../model/Product')
+const User=require('../models/User')
+const Cart=require('../models/Cart')
+const Product=require('../models/Product')
 
 const getCart=async (req,res)=>{
     try{

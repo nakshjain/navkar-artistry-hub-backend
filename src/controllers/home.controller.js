@@ -1,4 +1,4 @@
-const HomePageConfig = require("../model/HomePageConfig");
+const HomePageConfig = require("../models/HomePageConfig");
 
 const getHomePageDetails = async (req, res)=>{
     console.log("method=getHomePageDetails")
