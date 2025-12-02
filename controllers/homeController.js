@@ -1,42 +1,13 @@
+const HomePageConfig = require("../model/HomePageConfigSchema");
+
 const getHomePageDetails = async (req, res)=>{
-    const jsonObj =
-        {
-            "branding": {
-                "brandName": "Navkar Artistry Hub",
-                "brandUserName": "navkarArtistryHub",
-                "brandLogo": "/branding/logo.png",
-                "titleBackgroundImage": "/navkarArtistryHub/home-page/bg-desktop.png",
-                "titleBackgroundImageMobile": "/navkarArtistryHub/home-page/bg-mobile.png"
-            },
-            "sections": [
-                {
-                    "id": "category-showcase",
-                    "type": "grid",
-                    "title": "Explore Categories",
-                    "items": [
-                        {
-                            "alt": "home-page-paintings",
-                            "label": "Paintings",
-                            "image": "/navkarArtistryHub/home-page/paintings.png",
-                            "href": "shop/paintings"
-                        },
-                        {
-                            "alt": "home-page-home-decor",
-                            "label": "Home Decor",
-                            "image": "/navkarArtistryHub/home-page/home-decor.png",
-                            "href": "shop/home-decor"
-                        },
-                        {
-                            "alt": "home-page-jewellery",
-                            "label": "Jewellery",
-                            "image": "/navkarArtistryHub/home-page/jewellery.png",
-                            "href": "shop/jewellery"
-                        }
-                    ]
-                }
-            ]
-        }
-    res.status(200).json(res.addAssetUrl(jsonObj))
+    console.log("method=getHomePageDetails")
+    const tenantId = req.tenantId
+    const homePageConfig=await HomePageConfig.findOne({tenantId: tenantId})
+    if (!homePageConfig) {
+        return res.status(404).json({ error: 'Home Page Config Not Found' });
+    }
+    res.status(200).json(res.addAssetUrl(homePageConfig))
 }
 
 module.exports={getHomePageDetails}
