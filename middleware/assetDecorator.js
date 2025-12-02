@@ -1,4 +1,4 @@
-const base = process.env.ASSETS_URL;
+const base = process.env.R2_PUBLIC_URL;
 
 const assetDecorator = (req, res, next) => {
     res.addAssetUrl = (item) => {
