@@ -1,7 +1,6 @@
 const HomePageConfig = require("../models/HomePageConfig");
 
 const getHomePageDetails = async (req, res)=>{
-    console.log("method=getHomePageDetails")
     const tenantId = req.tenant.tenantId
     const homePageConfig=await HomePageConfig.findOne({tenantId: tenantId})
     if (!homePageConfig) {
