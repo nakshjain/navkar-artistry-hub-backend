@@ -17,10 +17,10 @@ const sendOTP=async (req,res)=>{
     let config={
         service:'gmail',
         auth:{
-            user:process.env.EMAIL,
-            pass:process.env.PASSWORD
+            user:env.EMAIL,
+            pass:env.PASSWORD
         },
-        from: '"Navkar Artistry Hub" <' + process.env.EMAIL + '>'
+        from: '"Navkar Artistry Hub" <' + env.EMAIL + '>'
     }
     const {OTP: generatedOTP,validity: validity}=generateOTP()
     let transporter = nodemailer.createTransport(config)
@@ -52,7 +52,7 @@ const sendOTP=async (req,res)=>{
 
     let mail=MailGenerator.generate(response)
     let message={
-        from: process.env.EMAIL,
+        from: env.EMAIL,
         to:userEmail,
         subject:" Your One-Time Password (OTP) for Account Registration",
         html: mail
@@ -96,7 +96,7 @@ const signUp= async (req, res)=>{
 
     const isValid=await checkOTPValidity(req.body.email, req.body.otp, res)
     if(isValid){
-        const salt=await bcrypt.genSalt(Number(process.env.SALT))
+        const salt=await bcrypt.genSalt(Number(env.SALT))
         const hashPassword= await bcrypt.hash(req.body.password, salt)
         await new User({...req.body, password: hashPassword}).save()
         return res.status(201).json({error:false, message:"Account created successfully"})
@@ -131,7 +131,7 @@ const login=async (req, res)=> {
         const payload={_id:user._id, roles: user.roles};
         const token=jwt.sign(
             payload,
-            process.env.TOKEN_PRIVATE_KEY,
+            env.TOKEN_PRIVATE_KEY,
             {expiresIn:expiry}
         )
         const{_id,password,__v,...userWithoutId}=user.toObject()
@@ -171,7 +171,7 @@ const resetPassword= async (req, res)=>{
         const isValid=await checkOTPValidity(req.body.email, req.body.otp, res)
         if(isValid){
             let existingUser= await User.findOne({email: req.body.email})
-            const salt=await bcrypt.genSalt(Number(process.env.SALT))
+            const salt=await bcrypt.genSalt(Number(env.SALT))
             existingUser.password=await bcrypt.hash(req.body.password, salt)
             await existingUser.save()
             return res.status(201).json({error:false, message:"Password updated successfully"})
@@ -193,10 +193,10 @@ const resetPasswordSendOtp= async (req, res)=>{
         let config={
             service:'gmail',
             auth:{
-                user:process.env.EMAIL,
-                pass:process.env.PASSWORD
+                user:env.EMAIL,
+                pass:env.PASSWORD
             },
-            from: '"Navkar Artistry Hub" <' + process.env.EMAIL + '>'
+            from: '"Navkar Artistry Hub" <' + env.EMAIL + '>'
         }
         const {OTP: generatedOTP,validity: validity}=generateOTP()
         let transporter = nodemailer.createTransport(config)
@@ -228,7 +228,7 @@ const resetPasswordSendOtp= async (req, res)=>{
         };
         let mail=MailGenerator.generate(response)
         let message={
-            from: process.env.EMAIL,
+            from: env.EMAIL,
             to:email,
             subject:" Your One-Time Password (OTP) for Account Registration",
             html: mail

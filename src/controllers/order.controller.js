@@ -61,8 +61,8 @@ const createPaymentOrder=async (req,res)=>{
         const expiryTime =new Date(Date.now() + 15 * 60000);
 
         const instance = new Razorpay({
-            key_id: process.env.RAZOR_PAY_KEY_ID,
-            key_secret:process.env.RAZOR_PAY_KEY_SECRET
+            key_id: env.RAZOR_PAY_KEY_ID,
+            key_secret:env.RAZOR_PAY_KEY_SECRET
         })
 
         const options={
@@ -108,7 +108,7 @@ const validatePayment=async (req, res)=>{
     try {
         const {response, paymentOrderId}=req.body
         const razorpay_signature=response.razorpay_signature
-        const key_secret=process.env.RAZOR_PAY_KEY_SECRET
+        const key_secret=env.RAZOR_PAY_KEY_SECRET
         const razorpay_payment_id = response.razorpay_payment_id
         const isPaymentVerified=validatePaymentVerification(
             {order_id: paymentOrderId, payment_id: razorpay_payment_id},

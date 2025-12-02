@@ -10,7 +10,7 @@ const auth=async (req,res, next)=>{
     try {
         const tokenDetails=jwt.verify(
             token,
-            process.env.TOKEN_PRIVATE_KEY
+            env.TOKEN_PRIVATE_KEY
         )
         req.user=tokenDetails
         next()

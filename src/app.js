@@ -1,16 +1,14 @@
 require("./config/env");
 const express =require('express');
-const dotenv=require("dotenv")
 const app=express();
 const cors = require('cors');
 
 const PORT=env.PORT;
 
-dotenv.config({path: './config.env'})
 require('./config/db')
 
 app.use(cors({
-    origin: process.env.ORIGIN_URL,
+    origin: env.ORIGIN_URL,
     credentials: true
 }));
 

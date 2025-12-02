@@ -1,16 +1,16 @@
 const {S3Client} = require("@aws-sdk/client-s3")
 
 const client = new S3Client({
-    region: process.env.R2_REGION,
-    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    region: env.CLOUD_REGION,
+    endpoint: `https://${env.CLOUD_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY,
-        secretAccessKey: process.env.R2_SECRET_KEY,
+        accessKeyId: env.CLOUD_ACCESS_KEY,
+        secretAccessKey: env.CLOUD_SECRET_KEY,
     }
 });
 
-const BUCKET = process.env.R2_BUCKET_NAME;
-const PUBLIC_URL = process.env.R2_PUBLIC_URL;
+const BUCKET = env.CLOUD_BUCKET;
+const PUBLIC_URL = env.CLOUD_PUBLIC_URL;
 
 module.exports = {
     client,
