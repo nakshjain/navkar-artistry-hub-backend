@@ -4,8 +4,16 @@ const assetDecorator = (req, res, next) => {
     res.addAssetUrl = (item) => {
         if (!item) return item;
 
+        const visited = new WeakSet();
+
         const processValue = (value) => {
             if (!value) return value;
+
+            // Prevent circular reference crashes
+            if (typeof value === "object") {
+                if (visited.has(value)) return value;
+                visited.add(value);
+            }
 
             if (typeof value === "string") {
                 if (value.startsWith("/")) return base + value;
