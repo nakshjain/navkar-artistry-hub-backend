@@ -21,6 +21,8 @@ const assetDecorator = require("./middleware/assetDecorator");
 app.use(assetDecorator);
 const authRouter = require('./router/auth');
 app.use('/auth', authRouter);
+const homeRouter = require('./router/home');
+app.use('/home', homeRouter);
 const userRouter = require('./router/user');
 app.use('/user', userRouter);
 const productRouter = require('./router/product');

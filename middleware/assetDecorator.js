@@ -1,28 +1,32 @@
-const base = process.env.ASSETS_URL;
+const base = process.env.R2_PUBLIC_URL;
 
 const assetDecorator = (req, res, next) => {
     res.addAssetUrl = (item) => {
         if (!item) return item;
 
-        const appendUrl = (obj) => {
-            if (!obj || typeof obj !== "object") return;
+        const processValue = (value) => {
+            if (!value) return value;
 
-            for (const key in obj) {
-                if (key === "imageLinks" && Array.isArray(obj[key])) {
-                    obj[key] = obj[key].map((imageUrl) => {
-                        if (typeof imageUrl === "string" && imageUrl.startsWith("/")) {
-                            return base + imageUrl;
-                        }
-                        return imageUrl;
-                    });
-                }
+            if (typeof value === "string") {
+                if (value.startsWith("/")) return base + value;
+                return value;
             }
+
+            if (Array.isArray(value)) {
+                return value.map((el) => processValue(el));
+            }
+
+            if (typeof value === "object") {
+                for (const key in value) {
+                    value[key] = processValue(value[key]);
+                }
+                return value;
+            }
+
+            return value;
         };
-
-        Array.isArray(item) ? item.forEach(appendUrl) : appendUrl(item);
-        return item;
+        return processValue(item);
     };
-
     next();
 };
 
