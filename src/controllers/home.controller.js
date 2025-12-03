@@ -1,8 +1,7 @@
 const HomePageConfig = require("../models/HomePageConfig");
 
 const getHomePageDetails = async (req, res)=>{
-    const tenantId = req.tenant.tenantId
-    const homePageConfig=await HomePageConfig.findOne({tenantId: tenantId})
+    const homePageConfig=await HomePageConfig.findOne()
     if (!homePageConfig) {
         return res.status(404).json({ error: 'Home Page Config Not Found' });
     }

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema=mongoose.Schema
+const tenantPlugin = require("./plugins/tenantPlugin");
 
 const SectionItemSchema = new Schema(
     {
@@ -76,7 +77,7 @@ const HomePageConfigSchema = new Schema(
     }
 );
 
-
+HomePageConfigSchema.plugin(tenantPlugin);
 const HomePageConfig= mongoose.model("HomePageConfig", HomePageConfigSchema);
 
 module.exports=HomePageConfig
