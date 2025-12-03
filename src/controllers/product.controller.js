@@ -173,9 +173,10 @@ const addProduct= async (req, res)=>{
 
 const addProductImages = async (req, res) => {
     try {
+        const tenant = req.tenant
         const productId = req.body.productId;
-        const product = await Product.findOne({ productId });
 
+        const product = await Product.findOne({ productId });
         if (!product) {
             return res.status(400).json({ message: 'Product not found' });
         }
@@ -187,13 +188,13 @@ const addProductImages = async (req, res) => {
             return res.status(400).json({ message: 'No files found' });
         }
 
-        for (let i = 0; i < req.files.length; i++) {
-            const file = req.files[i];
+        let index = product.imageLinks.length;
+
+        for (const file of req.files) {
             const ext = file.originalname.split('.').pop().toLowerCase();
+            const filename = `${index}.${ext}`;
 
-            const filename = `${i}.${ext}`;
-
-            const filePath = `navkarArtistryHub/products/${category}/${subCategory}/${productId}/${filename}`;
+            const filePath = `${tenant.brandUserName}/products/${category}/${subCategory}/${productId}/${filename}`;
 
             await R2.client.send(new PutObjectCommand({
                 Bucket: R2.BUCKET,
@@ -202,8 +203,9 @@ const addProductImages = async (req, res) => {
                 ContentType: file.mimetype,
             }));
 
-            const imageLink = `${R2.PUBLIC_URL}/${filePath}`;
+            const imageLink = '/'+filePath
             product.imageLinks.push(imageLink);
+            index++;
         }
 
         await product.save();

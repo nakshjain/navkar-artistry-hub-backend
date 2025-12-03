@@ -30,6 +30,7 @@ const tenantResolver = async (req, res, next) => {
             });
         }
 
+        req.tenant=tenant
         const store = requestContext.get();
         store.req.tenantId = tenant._id;
 
