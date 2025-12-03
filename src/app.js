@@ -2,6 +2,10 @@ require("./config/env");
 const express =require('express');
 const app=express();
 const cors = require('cors');
+const requestContext = require("./utils/requestContext");
+app.use((req, res, next) => {
+    requestContext.run({ req }, () => next());
+});
 
 const PORT=env.PORT;
 
