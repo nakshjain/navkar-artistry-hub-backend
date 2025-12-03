@@ -1,4 +1,5 @@
 const Tenant = require("../models/Tenant");
+const requestContext = require("../utils/requestContext");
 
 const tenantResolver = async (req, res, next) => {
     try {
@@ -29,10 +30,10 @@ const tenantResolver = async (req, res, next) => {
             });
         }
 
-        req.tenant = tenant;
-        req.tenant.tenantId = tenant._id;
+        const store = requestContext.get();
+        store.req.tenantId = tenant._id;
 
-        return next();
+        next();
 
     } catch (error) {
         console.error("Tenant Resolver Error:", error);

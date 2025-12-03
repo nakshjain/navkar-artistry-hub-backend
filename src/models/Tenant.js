@@ -22,7 +22,7 @@ const TenantSchema = new Schema(
         },
         customDomain: {
             type: String,
-            default: null,
+            default: "",
             trim: true
         },
         ownerId: {
