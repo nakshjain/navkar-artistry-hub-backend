@@ -288,7 +288,9 @@ const deleteProduct= async (req,res)=>{
 
 const addReview= async (req,res)=>{
     try{
-        let product= await Product.findOne({productId: req.body.productId})
+        const tenant = req.tenant
+        const productId = req.body.productId;
+        let product= await Product.findOne({productId: productId})
         if(product){
             const user= await User.findById(req.user._id)
             const orderDetails=await Order.exists({userId: user.userId, 'orderDetails.product': product._id})
@@ -305,32 +307,21 @@ const addReview= async (req,res)=>{
                 images: []
             }
 
-            const name = product.name.toLowerCase().replaceAll(/\s+/g, '-');
             const category = product.category.toLowerCase().replaceAll(/\s+/g, '-');
             const subCategory = product.subCategory.toLowerCase().replaceAll(/\s+/g, '-');
-            if (req.files.length!==0) {
-                let uploadFailed = false;
-                for (const file of req.files) {
-                    const filePath = `/reviews/${category}/${subCategory}/${name}/${file.originalname}`;
-                    const blob = bucket.file(filePath);
-                    const blobStream = blob.createWriteStream();
-                    await new Promise((resolve, reject) => {
-                        blobStream.on("error", (err) => {
-                            uploadFailed = true;
-                            reject(err);
-                        });
-                        blobStream.on("finish", () => {
-                            const imageLink = link + filePath;
-                            review.images.push(imageLink);
-                            resolve();
-                        });
-                        blobStream.end(file.buffer);
-                    });
-                }
-                if (uploadFailed) {
-                    res.status(500).json({ message: 'Some files failed to upload' });
-                }
+
+            for (let i=0;i<req.files?.length;i++) {
+                const file = req.files[i]
+                const ext = file.originalname.split('.').pop().toLowerCase();
+                const filename = `${i}.${ext}`;
+
+                const filePath = `${tenant.brandUserName}/reviews/${category}/${subCategory}/${productId}/${filename}`;
+                await storageService.uploadFile(file.buffer, file.mimetype, filePath);
+
+                const imageLink = '/'+filePath
+                review.images.push(imageLink);
             }
+
             const productRating=product.reviews.length*product.rating
             product.reviews.push(review)
             product.rating = (productRating + review.rating) / product.reviews.length
