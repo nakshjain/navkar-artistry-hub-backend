@@ -1,8 +1,8 @@
 const Product = require("../models/Product");
 const User = require("../models/User");
 const Order = require('../models/Order')
-const R2 = require("../config/storage");
-const {PutObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
+const storageService = require("../utils/storageService");
+const {DeleteObjectCommand} = require("@aws-sdk/client-s3");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
@@ -196,12 +196,7 @@ const addProductImages = async (req, res) => {
 
             const filePath = `${tenant.brandUserName}/products/${category}/${subCategory}/${productId}/${filename}`;
 
-            await R2.client.send(new PutObjectCommand({
-                Bucket: R2.BUCKET,
-                Key: filePath,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-            }));
+            await storageService.uploadFile(file.buffer, file.mimetype, filePath);
 
             const imageLink = '/'+filePath
             product.imageLinks.push(imageLink);
