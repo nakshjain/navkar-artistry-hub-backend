@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const tenantResolver = require("../middleware/tenantResolver");
 
+router.use("/health", require("./health.routes"));
 router.use("/auth", require("./auth.routes"));
 router.use("/home", tenantResolver, require("./home.routes"));
 router.use("/user", tenantResolver, require("./user.routes"));
