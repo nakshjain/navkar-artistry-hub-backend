@@ -1,8 +1,8 @@
 const Product = require("../models/Product");
 const User = require("../models/User");
 const Order = require('../models/Order')
+const storage = require("../config/storage");
 const storageService = require("../utils/storageService");
-const {DeleteObjectCommand} = require("@aws-sdk/client-s3");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
@@ -216,17 +216,11 @@ const addProductImages = async (req, res) => {
 const deleteProductImage= async (req,res)=>{
     try{
         const {imageUrl, productId}=req.body
-        const key=imageUrl.replace(R2.PUBLIC_URL, "");
 
-        await R2.client.send(
-            new DeleteObjectCommand({
-                Bucket: R2.BUCKET,
-                Key: key,
-            })
-        )
+        await storageService.deleteFile(imageUrl)
 
         const product= await Product.findOne({productId: productId})
-        product.imageLinks = product.imageLinks.filter((img) => img !== imageUrl)
+        product.imageLinks = product.imageLinks.filter((img) => img !== imageUrl.replace(storage.PUBLIC_URL, ""))
         await product.save()
         res.status(200).json({message: 'Product Image Removed Successfully'})
     } catch (error){
