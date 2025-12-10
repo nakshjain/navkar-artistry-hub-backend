@@ -57,11 +57,6 @@ const ReviewSchema= new mongoose.Schema({
 )
 
 const ProductSchema= new mongoose.Schema({
-        productId: {
-            type: String,
-            default: uuidv4,
-            unique: false
-        },
         artistName:{
             type: String,
             required: true
@@ -110,5 +105,13 @@ const ProductSchema= new mongoose.Schema({
     },
     { timestamps: true }
 )
+
+ProductSchema.virtual("productId").get(function () {
+    return this._id.toString();
+});
+
+ProductSchema.set("toJSON", { virtuals: true });
+ProductSchema.set("toObject", { virtuals: true });
+
 
 module.exports=mongoose.model('Product',ProductSchema);

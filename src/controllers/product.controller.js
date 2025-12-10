@@ -105,7 +105,7 @@ const getProductsByPagination= async (req,res)=>{
 }
 const getProductById=async (req, res)=>{
     const productId = req.params.id;
-    const product=await Product.findOne({productId: productId})
+    const product=await Product.findOne({_id: productId})
         .populate({
             path:'reviews.user',
             select:'name'
@@ -176,7 +176,7 @@ const addProductImages = async (req, res) => {
         const tenant = req.tenant
         const productId = req.body.productId;
 
-        const product = await Product.findOne({ productId });
+        const product = await Product.findOne({ _id : productId });
         if (!product) {
             return res.status(400).json({ message: 'Product not found' });
         }
@@ -219,7 +219,7 @@ const deleteProductImage= async (req,res)=>{
 
         await storageService.deleteFile(imageUrl)
 
-        const product= await Product.findOne({productId: productId})
+        const product= await Product.findOne({_id: productId})
         product.imageLinks = product.imageLinks.filter((img) => img !== imageUrl.replace(storage.PUBLIC_URL, ""))
         await product.save()
         res.status(200).json({message: 'Product Image Removed Successfully'})
@@ -232,7 +232,7 @@ const deleteProductImage= async (req,res)=>{
 const defaultProductImage= async (req, res)=>{
     try{
         const {productId, defaultImageUrl}=req.body
-        let product= await Product.findOne({productId: productId})
+        let product= await Product.findOne({_id: productId})
         if(product){
             let i=product.imageLinks.indexOf(defaultImageUrl)
             if(i>=0){
@@ -255,7 +255,7 @@ const updateProduct= async (req, res)=>{
         if(!name || !category || !subCategory || !price || !quantity || !availability){
             return res.status(422).json({error :'Products details not provided'})
         }
-        let product=await Product.findOne({productId: req.body.productId})
+        let product=await Product.findOne({_id: req.body.productId})
         if(!product){
             return res.status(404).json({ error: 'Product not found' });
         }
@@ -278,7 +278,7 @@ const updateProduct= async (req, res)=>{
 const deleteProduct= async (req,res)=>{
     try{
         const productId=req.params.productId
-        await Product.deleteOne({productId: productId})
+        await Product.deleteOne({_id: productId})
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error){
         console.error(error);
@@ -290,7 +290,7 @@ const addReview= async (req,res)=>{
     try{
         const tenant = req.tenant
         const productId = req.body.productId;
-        let product= await Product.findOne({productId: productId})
+        let product= await Product.findOne({_id: productId})
         if(product){
             const user= await User.findById(req.user._id)
             const orderDetails=await Order.exists({userId: user.userId, 'orderDetails.product': product._id})
