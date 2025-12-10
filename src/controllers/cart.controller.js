@@ -15,12 +15,15 @@ const getCart=async (req,res)=>{
                     return productId
                 }
             )
-            const products=await Product.find({productId: {$in: productIds}}).select('-__v')
+            const products=await Product.find({_id: {$in: productIds}}).select('-__v')
             let areSomeOutOfStock=false
             const cartWithoutId=cart.map(
                 (cartItem)=>{
                     const {productId, quantity}=cartItem
-                    const product=products.find((product)=>product.productId===productId)
+                    const product=products.find(
+                        (product)=>
+                            product._id.toString()===productId.toString()
+                    )
                     if(product){
                         return {
                             product: product,
@@ -104,9 +107,9 @@ const addToCart=async (req,res)=>{
     try{
         const {quantityToAdd}=req.query
         let quantityInt = parseInt(quantityToAdd);
-        const existingProduct = await Product.findOne({ productId: req.body.productId });
+        const existingProduct = await Product.findOne({ _id: req.body.productId });
         const product=existingProduct.toObject()
-        const productId= product.productId
+        const productId= product._id
         const maxQuantity=product.quantity
 
         const user = await User.findById(req.user._id);

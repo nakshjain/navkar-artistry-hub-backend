@@ -3,7 +3,7 @@ const {v4: uuidv4} = require("uuid");
 
 const Schema= mongoose.Schema
 
-const addressSchema= new Schema({
+const AddressSchema= new Schema({
     name:{
         type: String,
         required: true
@@ -42,7 +42,7 @@ const addressSchema= new Schema({
     }
 })
 
-const userSchema= new Schema({
+const UserSchema= new Schema({
     userId: {
         type: String,
         default: uuidv4,
@@ -75,7 +75,7 @@ const userSchema= new Schema({
         default:["user"]
     },
     addresses:{
-        type:[addressSchema],
+        type:[AddressSchema],
         required: false
 
     },
@@ -85,5 +85,5 @@ const userSchema= new Schema({
     }
 })
 
-const User=mongoose.model('USER',userSchema)
+const User=mongoose.model('USER',UserSchema)
 module.exports=User;
