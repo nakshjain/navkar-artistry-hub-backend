@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Navkar Artistry Hub" type="NodeJSConfigurationType" singleton="false" node-parameters="--inspect" path-to-js-file="src/app.js" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
