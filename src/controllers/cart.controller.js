@@ -106,7 +106,7 @@ const mergeCart= async (req,res)=>{
 const addToCart=async (req,res)=>{
     try{
         const {quantityToAdd}=req.query
-        let quantityInt = parseInt(quantityToAdd);
+        let quantityInt = Number.parseInt(quantityToAdd);
         const existingProduct = await Product.findOne({ _id: req.body.productId });
         const product=existingProduct.toObject()
         const productId= product._id
@@ -140,7 +140,7 @@ const addToCart=async (req,res)=>{
         }
 
         if(userCart){
-            const existingProductIndex = userCart.cart.findIndex(item => item.productId===productId);
+            const existingProductIndex = userCart.cart.findIndex(item => item.productId.toString()===productId.toString());
 
             if (existingProductIndex !== -1) {
                 const existingProductQuantity=userCart.cart[existingProductIndex].quantity
