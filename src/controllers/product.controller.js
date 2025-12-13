@@ -10,7 +10,7 @@ const getAllProducts= async (req, res)=>{
         const { _id, ...productWithoutId } = product.toObject();
         return productWithoutId;
     });
-    res.send(res.addAssetUrl(productsWithoutId));
+    res.send(productsWithoutId);
 }
 const getProducts= async (req,res)=>{
     try{
@@ -42,7 +42,7 @@ const getProducts= async (req,res)=>{
             productsQuery = productsQuery.sort(sortObject);
         }
         const products = await productsQuery;
-        res.status(200).json(res.addAssetUrl(products));
+        res.status(200).json(products);
     }catch (error){
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -96,7 +96,7 @@ const getProductsByPagination= async (req,res)=>{
             totalProducts,
             totalPages,
             currentPage: page,
-            products: res.addAssetUrl(paginatedProductsWithoutId)
+            products: paginatedProductsWithoutId
         });
     }catch (error){
         console.error(error);
@@ -126,7 +126,7 @@ const getProductById=async (req, res)=>{
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
-    return res.status(200).json(res.addAssetUrl(product))
+    return res.status(200).json(product)
 }
 
 const getProductsByCategory=async (req, res)=>{
@@ -134,7 +134,7 @@ const getProductsByCategory=async (req, res)=>{
     Product.find({category:category})
         .then(product=>{
             if(!product){return res.status((404)).end()}
-            return res.status(200).json(res.addAssetUrl(product))
+            return res.status(200).json(product)
         })
 }
 
@@ -144,7 +144,7 @@ const getProductsBySubCategory=async (req, res)=>{
     Product.find({category:category, subCategory:subCategory})
         .then(product=>{
             if(!product){return res.status((404)).end()}
-            return res.status(200).json(res.addAssetUrl(product))
+            return res.status(200).json(product)
         })
 }
 
