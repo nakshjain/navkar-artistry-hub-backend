@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Order = require('../models/Order')
 const storage = require("../config/storage");
 const storageService = require("../utils/storageService");
+const logger = require("../utils/logger");
 
 const getAllProducts= async (req, res)=>{
     const allProducts= await Product.find();
@@ -148,27 +149,54 @@ const getProductsBySubCategory=async (req, res)=>{
         })
 }
 
-const addProduct= async (req, res)=>{
-    const {name, category, subCategory, imageLinks, price,quantity, availability, about}=req.body;
-    if(!name || !category || !subCategory || !price || !availability || !quantity || !about){
-        return res.status(422).json({error :'Products details not provided'})
+const addProduct = async (req, res) => {
+    try {
+        const { name, category, subCategory, imageLinks, price, quantity, availability, about } = req.body;
+
+        if (!name || !category || !subCategory || !price || !availability || !quantity || !about) {
+            logger.warn("Add product validation failed", { bodyKeys: Object.keys(req.body || {}) });
+            return res.status(422).json({ error: "Product details not provided" });
+        }
+
+        const user = await User.findById(req.user._id);
+        const artistName = user.name;
+
+        const existing = await Product.findOne({ name, category, subCategory });
+
+        if (existing) {
+            logger.warn("Duplicate product attempt", { name, category, subCategory });
+            return res.status(409).json({ error: "Product already exists" });
+        }
+
+        const product = new Product({
+            artistName,
+            name,
+            category,
+            subCategory,
+            imageLinks,
+            price,
+            quantity,
+            availability,
+            about
+        });
+
+        await product.save();
+
+        logger.info("Product added successfully", {
+            productId: product._id,
+            name,
+            artistName
+        });
+
+        return res.status(201).json({ message: "Product added successfully" });
+
+    } catch (err) {
+        logger.error("Failed to add product", {
+            error: err.message,
+            stack: err.stack
+        });
+        return res.status(500).json({ error: "Product could not be added" })
     }
-    const user=await User.findById(req.user._id)
-    const artistName=user.name
-    Product.findOne({name:name, category: category, subCategory:subCategory})
-        .then((productExist)=>{
-            if(productExist){
-                return res.status(409).json({error :'Product already exists'})
-            }
-            const product= new Product({artistName, name, category, subCategory, imageLinks, price, quantity, availability, about})
-            product.save().then(()=>{
-                res.status(201).json({message: 'Product added successfully'});
-            }).catch((error)=>{
-                res.status(500).json({error:'Product could not be added'})
-            })
-        }).catch(err=>{
-        console.error(err)
-    })
 }
 
 const addProductImages = async (req, res) => {
