@@ -9,7 +9,7 @@ const WishlistSchema= new Schema({
             required:true
         },
         wishlist:{
-            type:[String],
+            type:[mongoose.Schema.Types.ObjectId],
             required: true
         }
     },

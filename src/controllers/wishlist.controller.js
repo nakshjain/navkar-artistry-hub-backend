@@ -9,7 +9,7 @@ const getWishlist=async (req, res)=>{
         let wishlist=await Wishlist.findOne({userId:userId})
         let productsInWishlist=[]
         if(wishlist){
-            productsInWishlist=await Product.find({productId: {$in: wishlist.wishlist}}).select('-_id -__v')
+            productsInWishlist=await Product.find({_id: {$in: wishlist.wishlist}}).select('-__v')
         } else {
             wishlist=new Wishlist({
                 userId: userId,

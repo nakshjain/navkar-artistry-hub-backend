@@ -5,7 +5,7 @@ const getHomePageDetails = async (req, res)=>{
     if (!homePageConfig) {
         return res.status(404).json({ error: 'Home Page Config Not Found' });
     }
-    res.status(200).json(res.addAssetUrl(homePageConfig))
+    res.status(200).json(homePageConfig)
 }
 
 module.exports={getHomePageDetails}
