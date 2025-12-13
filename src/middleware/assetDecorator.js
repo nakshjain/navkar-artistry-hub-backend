@@ -1,7 +1,8 @@
 const base = env.CLOUD_PUBLIC_URL;
 
 const assetDecorator = (req, res, next) => {
-    res.addAssetUrl = (item) => {
+
+    const decorate = (item) => {
         if (!item) return item;
 
         const visited = new WeakSet();
@@ -35,6 +36,21 @@ const assetDecorator = (req, res, next) => {
         };
         return processValue(item);
     };
+
+    const originalJson = res.json;
+    res.json = function (data) {
+        const modified = decorate(data);
+        return originalJson.call(this, modified);
+    };
+
+    const originalSend = res.send;
+    res.send = function (data) {
+        if (data && typeof data === "object") {
+            data = decorate(data);
+        }
+        return originalSend.call(this, data);
+    };
+
     next();
 };
 
