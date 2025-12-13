@@ -50,19 +50,29 @@ To set up the back-end locally, follow these steps:
 
 3. Set up environment variables by creating a `.env` file:
     ```plaintext
-    PORT=3000
+    PORT=your_port
     ORIGIN_URL=your_origin_url
-    ASSETS_URL=your_assets_url
-    DATABASE=your_mongodb_connection_string
+    DATABASE=your_database_url
+
+    BASE_DOMAIN=your_base_domain
+
     EMAIL=your_email
-    PASSWORD=your_password
+    PASSWORD=your_email_password
+
     SALT=your_salt
     TOKEN_PRIVATE_KEY=your_token_private_key
-    GOOGLE_CLOUD_BUCKET_NAME=your_google_cloud_bucket_name
-    GOOGLE_CLOUD_KEYFILE_PATH=your_google_cloud_keyfile_path
-    GOOGLE_CLOUD_PROJECT_ID=your_google_cloud_project_id
+    
     RAZOR_PAY_KEY_ID=your_razorpay_key_id
     RAZOR_PAY_KEY_SECRET=your_razorpay_key_secret
+    CLOUD_PROVIDER=your_storage_provider
+    CLOUD_ACCESS_KEY=your_cloud_access_key
+    CLOUD_SECRET_KEY=your_cloud_secret_key
+    CLOUD_BUCKET=your_bucket_name
+    CLOUD_PUBLIC_URL=your_public_cdn_url
+    CLOUD_ACCOUNT_ID=your_cloud_account_id
+    CLOUD_REGION=your_bucket_region
+    CLOUD_PROJECT_ID=your_cloud_project_id
+    CLOUD_ENDPOINT=your_bucket_endpoint
     ```
 
 4. Start the server:
